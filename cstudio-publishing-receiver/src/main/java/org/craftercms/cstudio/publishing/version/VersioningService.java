@@ -46,7 +46,7 @@ public class VersioningService {
 		ioCharset = Charset.forName(charset);
 	}
 	
-	public void writeNewVersion(String newVersion, String targetName) throws VersionException {
+	public void writeNewVersion(String newVersion, String targetName, String site) throws VersionException {
 		PublishingTarget target = this.targetManager.getTarget(targetName);
 		FileOutputStream fout=null;
 		if (target == null) {
@@ -54,7 +54,7 @@ public class VersioningService {
 			throw new VersionException("Unable to get Target with name " + targetName);
 		}
 		try {
-			String path = buildContentPath(target);
+			String path = buildContentPath(target, site);
 			String finalName = path + File.separator + fileName;
 			fout = new FileOutputStream(finalName);
 			fout.write(newVersion.getBytes(ioCharset));
@@ -75,7 +75,7 @@ public class VersioningService {
 		}
 	}
 
-	public String readVersion(String targetName) throws VersionException {
+	public String readVersion(String targetName, String site) throws VersionException {
 		PublishingTarget target = this.targetManager.getTarget(targetName);
 		FileInputStream fin = null;
 		ByteArrayOutputStream out = null;
@@ -85,7 +85,7 @@ public class VersioningService {
 			throw new VersionException("Unable to get Target with name " + targetName);
 		}
 		try {
-			String path = buildContentPath(target);
+			String path = buildContentPath(target, site);
 			String finalName = path + File.separator + fileName;
 			File f = new File(finalName);
 			if (f.exists()) {
@@ -142,12 +142,23 @@ public class VersioningService {
 	 * @throws PublishingException
 	 *             If Working dir can't be calculated
 	 */
-	protected String buildContentPath(PublishingTarget target) throws PublishingException {
+	protected String buildContentPath(PublishingTarget target, String site) throws PublishingException {
 		LOGGER.debug("Building root Path");
-		File directory = new File(".");
-		String path = directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File.separator
-				+ target.getParameter(FileUploadServlet.CONFIG_ROOT);
-		LOGGER.debug("Build path is " + path);
+		File f = new File(target.getParameter(FileUploadServlet.CONFIG_ROOT));
+		String path = "";
+		// Exists, is a dir and have rw permitions
+		if (f.isAbsolute()) {
+			path = target.getParameter(FileUploadServlet.CONFIG_ROOT) + File.separator + site;
+		} else {
+			File directory = new File(".");
+			path = directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File.separator
+					+ target.getParameter(FileUploadServlet.CONFIG_ROOT) + File.separator + site;
+		}
+		File checkFolder = new File(path);
+		if (!checkFolder.exists()) {
+			LOGGER.debug("Creating path " + path);
+			checkFolder.mkdirs();
+		}
 		return path;
 	}
 

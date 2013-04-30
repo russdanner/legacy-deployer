@@ -42,11 +42,15 @@ public class DeployVersionServlet extends HttpServlet {
 		PrintWriter serverOut = response.getWriter();
 		try {
 			String target = request.getParameter(FileUploadServlet.PARAM_TARGET);
+			String site = request.getParameter(FileUploadServlet.PARAM_SITE);
 			if (StringUtils.isEmpty(target)) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				serverOut.write("Parameter \"" + FileUploadServlet.PARAM_TARGET + "\" is need");
+			} else if (StringUtils.isEmpty(site)) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				serverOut.write("Parameter \"" + FileUploadServlet.PARAM_SITE + "\" is need");
 			} else {
-				String currerntVersion = versioningService.readVersion(target);
+				String currerntVersion = versioningService.readVersion(target,site);
 				response.setStatus(HttpServletResponse.SC_OK);
 				serverOut.write(currerntVersion);
 			}
@@ -80,6 +84,7 @@ public class DeployVersionServlet extends HttpServlet {
 		PrintWriter serverOut = response.getWriter();
 		try {
 			String target = request.getParameter(FileUploadServlet.PARAM_TARGET);
+			String site = request.getParameter(FileUploadServlet.PARAM_SITE);
 			String version = request.getParameter(PARAM_NEW_VERSION);
 			if (StringUtils.isEmpty(target)) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -87,8 +92,11 @@ public class DeployVersionServlet extends HttpServlet {
 			} else if (StringUtils.isEmpty(version)) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				serverOut.write("Parameter \"" + PARAM_NEW_VERSION + "\" is need and can not be empty");
+			} else if (StringUtils.isEmpty(site)) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				serverOut.write("Parameter \"" + PARAM_NEW_VERSION + "\" is need and can not be empty");
 		}else {
-				versioningService.writeNewVersion(version, target);
+				versioningService.writeNewVersion(version, target, site);
 				response.setStatus(HttpServletResponse.SC_OK);
 				serverOut.write(version);
 			}
