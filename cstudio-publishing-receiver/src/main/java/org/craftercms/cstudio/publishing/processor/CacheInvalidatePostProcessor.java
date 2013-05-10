@@ -25,6 +25,7 @@ import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
@@ -35,9 +36,10 @@ import java.util.Map;
  */
 public class CacheInvalidatePostProcessor implements PublishingProcessor {
 
-    private static final Log log = LogFactory.getLog(CacheInvalidatePostProcessor.class);
+    private static final Log logger = LogFactory.getLog(CacheInvalidatePostProcessor.class);
 
     protected String _cacheInvalidateUrl;
+
     public void setCacheInvalidateUrl(String cacheInvalidateUrl) {
         this._cacheInvalidateUrl = cacheInvalidateUrl;
     }
@@ -47,13 +49,20 @@ public class CacheInvalidatePostProcessor implements PublishingProcessor {
         HttpMethod cacheInvalidateGetMethod = new GetMethod(_cacheInvalidateUrl);
         HttpClient client = new HttpClient();
         try {
-            client.executeMethod(cacheInvalidateGetMethod);
+            int status = client.executeMethod(cacheInvalidateGetMethod);
+            if (status != HttpServletResponse.SC_OK) {
+                throw new PublishingException("Unable to invalidate cache: URL " + _cacheInvalidateUrl + " returned status '" +
+                        cacheInvalidateGetMethod.getStatusText() + "' with body \n" + cacheInvalidateGetMethod.getResponseBodyAsString());
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Cache invalidated: URL " + _cacheInvalidateUrl + " returned status '" +
+                            cacheInvalidateGetMethod.getStatusText() + "'");
+                }
+            }
         } catch (IOException e) {
             throw new PublishingException(e);
         } finally {
             cacheInvalidateGetMethod.releaseConnection();
-            cacheInvalidateGetMethod = null;
-            client = null;
         }
     }
 
@@ -61,4 +70,5 @@ public class CacheInvalidatePostProcessor implements PublishingProcessor {
     public String getName() {
         return CacheInvalidatePostProcessor.class.getName();
     }
+
 }

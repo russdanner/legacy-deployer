@@ -111,7 +111,7 @@ public class SearchUpdateProcessor implements PublishingProcessor {
                         File file = new File(root + fileName);
 
                         try {
-                            searchService.update(siteName, fileName, FileUtils.readFileToString(file, charEncoding), true);
+                            searchService.update(siteId, fileName, FileUtils.readFileToString(file, charEncoding), true);
 
                             if (logger.isDebugEnabled()) {
                                 logger.debug(siteId + ":" + fileName + " added to search index");

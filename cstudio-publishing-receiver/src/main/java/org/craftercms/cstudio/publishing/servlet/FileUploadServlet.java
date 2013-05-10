@@ -74,9 +74,7 @@ public class FileUploadServlet extends HttpServlet {
 
     @Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-
 		if (ServletFileUpload.isMultipartContent(request)) {
-
 			ServletFileUpload servletFileUpload = createServletFileUpload();
 			List<FileItem> fileItemsList = null;
 			Map<String, String> parameters = new HashMap<String, String>(11);
@@ -120,12 +118,9 @@ public class FileUploadServlet extends HttpServlet {
                         LOGGER.warn("Illegal publish request received.");
                     }
                 }
-			} catch (FileUploadException e) {
+			} catch (Exception e) {
 				handleErrorCase(files, response, e);
-			} catch (IOException e) {
-				handleErrorCase(files, response, e);
-			} 
-
+			}
 		}
 	}
 
@@ -392,10 +387,8 @@ public class FileUploadServlet extends HttpServlet {
 					}
 					processor.doProcess(changeSet, parameters, target);
 				}
-			} catch (PublishingException e) {
-				if (LOGGER.isErrorEnabled()) {
-					LOGGER.error("Error while running a post process.", e);
-				}
+			} catch (Exception e) {
+                LOGGER.error("Error while running a post processor", e);
 			}
 		}
 	}
