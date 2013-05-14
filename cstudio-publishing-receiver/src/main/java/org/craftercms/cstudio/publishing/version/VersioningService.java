@@ -16,13 +16,6 @@
  */
 package org.craftercms.cstudio.publishing.version;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +24,14 @@ import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.cstudio.publishing.target.TargetManager;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class VersioningService {
-	
+
+    protected static ReentrantLock fileLock = new ReentrantLock();
+
 	private static final String DEFAULT_VERSION = "0";
 	private static final int BUFFER_SIZE = 1024;
 	private static Log LOGGER = LogFactory.getLog(VersioningService.class);
@@ -53,6 +52,7 @@ public class VersioningService {
 			LOGGER.error("Unable to get Target with name " + targetName);
 			throw new VersionException("Unable to get Target with name " + targetName);
 		}
+        fileLock.lock();
 		try {
 			String path = buildContentPath(target);
 			String finalName = path + File.separator + fileName;
@@ -72,6 +72,7 @@ public class VersioningService {
 			} catch (IOException ex) {
 				LOGGER.error("Unable to IO resources",ex);
 			}
+            fileLock.unlock();
 		}
 	}
 
@@ -79,11 +80,12 @@ public class VersioningService {
 		PublishingTarget target = this.targetManager.getTarget(targetName);
 		FileInputStream fin = null;
 		ByteArrayOutputStream out = null;
-		String readedVersion = DEFAULT_VERSION;
+		String readVersion = DEFAULT_VERSION;
 		if (target == null) {
 			LOGGER.error("Unable to get Target with name " + targetName);
 			throw new VersionException("Unable to get Target with name " + targetName);
 		}
+        fileLock.lock();
 		try {
 			String path = buildContentPath(target);
 			String finalName = path + File.separator + fileName;
@@ -96,10 +98,10 @@ public class VersioningService {
 				while (fin.read(buff) >= 0) {
 					out.write(buff);
 				}
-				readedVersion = new String(out.toByteArray(), charset);
+				readVersion = new String(out.toByteArray(), charset);
 				// Version can not be empty File must be corrupt
-				if (StringUtils.isEmpty(readedVersion)) {
-					readedVersion = DEFAULT_VERSION;
+				if (StringUtils.isEmpty(readVersion)) {
+					readVersion = DEFAULT_VERSION;
 				}
 			} else {
 				LOGGER.debug("Version File " + finalName + " does not exist returning default value");
@@ -121,8 +123,9 @@ public class VersioningService {
 			} catch (IOException ex) {
 				LOGGER.error("Unable to IO resources", ex);
 			}
+            fileLock.unlock();
 		}
-		return readedVersion;
+		return readVersion;
 	}
 
 	public void setFileName(String fileName) {
