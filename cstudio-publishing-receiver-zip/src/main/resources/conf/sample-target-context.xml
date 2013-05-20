@@ -114,7 +114,7 @@
 	</bean>
 
 	<bean id="SearchService"
-		class="org.craftercms.crafter.search.service.impl.RestClientSearchService">
+		class="org.craftercms.search.service.impl.RestClientSearchService">
 		<property name="serverUrl" value="http://localhost:8180/crafter-search" />
 	</bean>
 
