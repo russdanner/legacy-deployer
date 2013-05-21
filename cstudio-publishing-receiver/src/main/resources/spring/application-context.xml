@@ -5,6 +5,6 @@
 
     <import resource="classpath*:cstudio/publishing/receiver/base-context.xml" />
 
-    <import resource="file:conf/*-receiver-context.xml" />
+    <import resource="classpath*:conf/*-receiver-context.xml" />
 
 </beans>
