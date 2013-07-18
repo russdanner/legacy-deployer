@@ -234,7 +234,7 @@ public class FileUploadServlet extends HttpServlet {
             boolean isMetadata = entry.getKey().startsWith("metadata");
 			String contentLocation = parameters.get(locationParamName);
             StringBuilder sbFullPath = new StringBuilder(target.getParameter(CONFIG_ROOT));
-            sbFullPath.append("/");
+            sbFullPath.append(File.separator);
             if (isMetadata)
                 sbFullPath.append(target.getParameter(CONFIG_METADATA_FOLDER));
             else
@@ -305,7 +305,7 @@ public class FileUploadServlet extends HttpServlet {
 				String contentLocation = tokens.nextToken();
 				contentLocation = StringUtils.trimWhitespace(contentLocation);
 				String root = target.getParameter(CONFIG_ROOT);
-				String fullPath = root + '/' + target.getParameter(CONFIG_CONTENT_FOLDER) + contentLocation;
+				String fullPath = root + File.separator + target.getParameter(CONFIG_CONTENT_FOLDER) + contentLocation;
 				if (LOGGER.isInfoEnabled()) {
 					LOGGER.info("deleting " + fullPath);
 				}
@@ -356,8 +356,8 @@ public class FileUploadServlet extends HttpServlet {
 	private void deleteChildren(String[] children, String parentFullPath, String parentPath, List<String> deletedFiles) {
 		if (children != null) {
 			for (String child : children) {
-				String childFullPath = parentFullPath + "/" + child;
-				String childPath = parentPath + "/" + child;
+				String childFullPath = parentFullPath + File.separator + child;
+				String childPath = parentPath + File.separator + child;
 				File file = new File(childFullPath);
 				if (file.isFile()) {
 					file.delete();

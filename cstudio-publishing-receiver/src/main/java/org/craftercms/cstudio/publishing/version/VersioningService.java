@@ -54,14 +54,11 @@ public class VersioningService {
 		}
         fileLock.lock();
 		try {
-			String path = buildContentPath(target);
+			String path = target.getParameter(FileUploadServlet.CONFIG_ROOT);
 			String finalName = path + File.separator + fileName;
 			fout = new FileOutputStream(finalName);
 			fout.write(newVersion.getBytes(ioCharset));
 			fout.flush();
-		} catch (PublishingException ex) {
-			LOGGER.error("Unable to calculate Target (" + targetName + ") root dir", ex);
-			throw new VersionException("Unable to calculate Target (" + targetName + ") root dir");
 		} catch (IOException ioEx) {
 			LOGGER.error("Unable to read or write file " + fileName, ioEx);
 			throw new VersionException("Unable to read/write File " + fileName);
@@ -87,7 +84,7 @@ public class VersioningService {
 		}
         fileLock.lock();
 		try {
-			String path = buildContentPath(target);
+			String path = target.getParameter(FileUploadServlet.CONFIG_ROOT);
 			String finalName = path + File.separator + fileName;
 			File f = new File(finalName);
 			if (f.exists()) {
@@ -106,9 +103,6 @@ public class VersioningService {
 			} else {
 				LOGGER.debug("Version File " + finalName + " does not exist returning default value");
 			}
-		} catch (PublishingException ex) {
-			LOGGER.error("Unable to calculate Target (" + targetName + ") root dir", ex);
-			throw new VersionException("Unable to calculate Target (" + targetName + ") root dir");
 		} catch (IOException ioEx) {
 			LOGGER.error("Unable to read or write file " + fileName, ioEx);
 			throw new VersionException("Unable to read/write File " + fileName);
@@ -134,24 +128,6 @@ public class VersioningService {
 
 	public void setTargetManager(TargetManager targetManager) {
 		this.targetManager = targetManager;
-	}
-
-	/**
-	 * Build Default Path from targets parameters
-	 * 
-	 * @param target
-	 *            Target to base build of the root
-	 * @return Relative to working directory path of where the content should be
-	 * @throws PublishingException
-	 *             If Working dir can't be calculated
-	 */
-	protected String buildContentPath(PublishingTarget target) throws PublishingException {
-		LOGGER.debug("Building root Path");
-		File directory = new File(".");
-		String path = directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File.separator
-				+ target.getParameter(FileUploadServlet.CONFIG_ROOT);
-		LOGGER.debug("Build path is " + path);
-		return path;
 	}
 
 	public void setCharset(String charset) {
