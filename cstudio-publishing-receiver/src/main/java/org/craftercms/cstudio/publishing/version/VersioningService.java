@@ -48,6 +48,7 @@ public class VersioningService {
 	public void writeNewVersion(String newVersion, String targetName) throws VersionException {
 		PublishingTarget target = this.targetManager.getTarget(targetName);
 		FileOutputStream fout=null;
+        File file = null;
 		if (target == null) {
 			LOGGER.error("Unable to get Target with name " + targetName);
 			throw new VersionException("Unable to get Target with name " + targetName);
@@ -56,7 +57,12 @@ public class VersioningService {
 		try {
 			String path = target.getParameter(FileUploadServlet.CONFIG_ROOT);
 			String finalName = path + File.separator + fileName;
-			fout = new FileOutputStream(finalName);
+            file = new File(finalName);
+            if (!file.exists()) {
+                file.getParentFile().mkdirs();
+                file.createNewFile();
+            }
+			fout = new FileOutputStream(file);
 			fout.write(newVersion.getBytes(ioCharset));
 			fout.flush();
 		} catch (IOException ioEx) {
