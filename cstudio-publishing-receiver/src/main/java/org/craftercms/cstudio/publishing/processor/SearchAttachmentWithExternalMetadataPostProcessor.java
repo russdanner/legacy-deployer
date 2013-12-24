@@ -64,7 +64,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                 processFiles(siteId, root, deletedFiles, true);
             }
         } catch (Exception exc) {
-            int x = 0;
+            logger.error("Error: ", exc);
+            throw new PublishingException("Failed to complete postprocessing.", exc);
         }
     }
 
@@ -72,7 +73,7 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         throws IOException {
         for (String filePath : fileList) {
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Processing file {0} for site {1}", filePath, siteId));
+                logger.debug(String.format("Processing file %s for site %s", filePath, siteId));
             }
             File file = new File(root + filePath);
             String updateIndexPath = filePath;
@@ -92,10 +93,15 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                                 logger.debug("Extracting properties.");
                             }
                             externalProperties = parseMetadataFile(document);
+                            file = new File(root + updateIndexPath);
+                            if (!file.exists()) {
+                                file.createNewFile();
+                            }
                             searchIndexUpdate = true;
                         }
                     } catch (DocumentException e) {
-                        logger.error(String.format("Error while opening xml file {0} for site {1}", filePath, siteId), e);
+                        logger.error(String.format("Error while opening xml file %s for site %s", filePath, siteId),
+                            e);
                     }
                     if (logger.isDebugEnabled()) {
                         logger.debug("Metadata processing finished.");
@@ -106,11 +112,16 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
             }
             if (searchIndexUpdate) {
                 if(isDelete) {
-                    searchService.delete(siteId, filePath);
+                    searchService.delete(siteId, updateIndexPath);
                 } else  {
-                    searchService.updateDocument(siteId, filePath, file, externalProperties);
+                    if (logger.isDebugEnabled()){
+                        logger.debug(String.format("Sending search update request for file %s [%s] for site %s",
+                            updateIndexPath, filePath, siteId));
+                    }
+                    searchService.partialDocumentUpdate(siteId, updateIndexPath, file, externalProperties);
                 }
             }
+            searchService.commit();
         }
     }
 
@@ -121,31 +132,35 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         return properties;
     }
 
-    private void processElementChildren(final Element element, final String prefix, final Map<String,String> properties) {
+    private void processElementChildren(final Element element, final String key, final Map<String,String> properties) {
         for (int i = 0, size = element.nodeCount(); i < size; i++) {
             Node node = element.node(i);
             if (logger.isDebugEnabled()) {
-                logger.debug(String.format("Processing xml element {0}", node.getPath()));
+                logger.debug(String.format("Processing xml element %s", node.getPath()));
             }
             if (node instanceof Element) {
-                processElementChildren((Element)node, String.format("{0}{1}.", prefix, node.getName()), properties);
+                StringBuilder sbPrefix = new StringBuilder(key);
+                if (sbPrefix.length() > 0) {
+                    sbPrefix.append(".");
+                }
+                sbPrefix.append(node.getName());
+                if (!excludeProperties.contains(sbPrefix.toString())) {
+                    processElementChildren((Element)node, sbPrefix.toString(), properties);
+                }
             } else {
-                String key = prefix + node.getName();
-                if (!excludeProperties.contains(key)) {
-                    StringBuilder sb = new StringBuilder();
-                    if (properties.containsKey(key)) {
-                        sb.append(properties.get(key));
-                        if (sb.length() > 0) {
-                            sb.append(',');
-                        }
+                StringBuilder sb = new StringBuilder();
+                if (properties.containsKey(key)) {
+                    sb.append(properties.get(key));
+                    if (sb.length() > 0) {
+                        sb.append(',');
                     }
-                    String value = node.getText();
-                    if (StringUtils.isNotBlank(value)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(String.format("Adding value [{0}] for property [{1}].", value, key));
-                        }
-                        properties.put(key, StringUtils.trim(value));
+                }
+                String value = node.getText();
+                if (StringUtils.isNotBlank(value)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(String.format("Adding value [%s] for property [%s].", value, key));
                     }
+                    properties.put(key, StringUtils.trim(value));
                 }
             }
         }
@@ -195,5 +210,54 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
     @Override
     public String getName() {
         return SearchAttachmentWithExternalMetadataPostProcessor.class.getSimpleName();
+    }
+
+
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public void setSiteName(final String siteName) {
+        this.siteName = siteName;
+    }
+
+    public SearchService getSearchService() {
+        return searchService;
+    }
+
+    public void setSearchService(final SearchService searchService) {
+        this.searchService = searchService;
+    }
+
+    public List<String> getExcludeProperties() {
+        return excludeProperties;
+    }
+
+    public void setExcludeProperties(final List<String> excludeProperties) {
+        this.excludeProperties = excludeProperties;
+    }
+
+    public List<String> getAttachmentPathPatterns() {
+        return attachmentPathPatterns;
+    }
+
+    public void setAttachmentPathPatterns(final List<String> attachmentPathPatterns) {
+        this.attachmentPathPatterns = attachmentPathPatterns;
+    }
+
+    public List<String> getMetadataPathPatterns() {
+        return metadataPathPatterns;
+    }
+
+    public void setMetadataPathPatterns(final List<String> metadataPathPatterns) {
+        this.metadataPathPatterns = metadataPathPatterns;
+    }
+
+    public List<String> getReferenceXpathList() {
+        return referenceXpathList;
+    }
+
+    public void setReferenceXpathList(final List<String> referenceXpathList) {
+        this.referenceXpathList = referenceXpathList;
     }
 }
