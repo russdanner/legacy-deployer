@@ -121,4 +121,32 @@
 	<bean id="SamplePostProcessor"
 		class="org.craftercms.cstudio.publishing.processor.SamplePostProcessor" />
 
+    <bean id="SearchAttachmentWithExternalMetadataPostProcessor"
+          class="org.craftercms.cstudio.publishing.processor.SearchAttachmentWithExternalMetadataPostProcessor">
+        <property name="searchService" ref="SearchService"/>
+        <property name="siteName">
+            <value>sample</value>
+        </property>
+        <property name="excludeProperties">
+            <list>
+                <value>binary</value>
+            </list>
+        </property>
+        <property name="attachmentPathPatterns">
+            <list>
+                <value>/static-assets/attachment/([^&lt;"'\)]+)</value>
+            </list>
+        </property>
+        <property name="metadataPathPatterns">
+            <list>
+                <value>/site/components/attachment/([^&lt;]+).xml</value>
+            </list>
+        </property>
+        <property name="referenceXpathList">
+            <list>
+                <value>//binary/item/value</value>
+            </list>
+        </property>
+    </bean>
+
 </beans>
