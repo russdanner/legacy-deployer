@@ -147,6 +147,7 @@
                 <value>//binary/item/value</value>
             </list>
         </property>
+        <property name="multivalueSeparator" value=","/>
     </bean>
 
 </beans>

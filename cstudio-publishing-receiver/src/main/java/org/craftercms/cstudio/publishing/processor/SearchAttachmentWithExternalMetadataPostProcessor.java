@@ -33,6 +33,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
     private List<String> attachmentPathPatterns;
     private List<String> metadataPathPatterns;
     private List<String> referenceXpathList;
+    private String multivalueSeparator = ",";
+
 
 
     @Override
@@ -95,6 +97,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                             externalProperties = parseMetadataFile(document);
                             file = new File(root + updateIndexPath);
                             if (!file.exists()) {
+                                File dir = file.getParentFile();
+                                dir.mkdirs();
                                 file.createNewFile();
                             }
                             searchIndexUpdate = true;
@@ -152,7 +156,7 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                 if (properties.containsKey(key)) {
                     sb.append(properties.get(key));
                     if (sb.length() > 0) {
-                        sb.append(',');
+                        sb.append(multivalueSeparator);
                     }
                 }
                 String value = node.getText();
@@ -259,5 +263,13 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
 
     public void setReferenceXpathList(final List<String> referenceXpathList) {
         this.referenceXpathList = referenceXpathList;
+    }
+
+    public String getMultivalueSeparator() {
+        return multivalueSeparator;
+    }
+
+    public void setMultivalueSeparator(final String multivalueSeparator) {
+        this.multivalueSeparator = multivalueSeparator;
     }
 }
