@@ -164,7 +164,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                     if (logger.isDebugEnabled()) {
                         logger.debug(String.format("Adding value [%s] for property [%s].", value, key));
                     }
-                    properties.put(key, StringUtils.trim(value));
+                    sb.append(value);
+                    properties.put(key, StringUtils.trim(sb.toString()));
                 }
             }
         }
