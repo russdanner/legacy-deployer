@@ -156,14 +156,16 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
                 }
 
                 File includeFile = new File(includeSrcPath);
-                includeReader.setEncoding(charEncoding);
-                Document includeDocument = includeReader.read(includeFile);
+                if (includeFile != null && includeFile.exists()) {
+                    includeReader.setEncoding(charEncoding);
+                    Document includeDocument = includeReader.read(includeFile);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                    }
+
+                    doInclude(includeElement, includeSrcPath, includeDocument);
                 }
-
-                doInclude(includeElement, includeSrcPath, includeDocument);
 
             }
             finalXml = document.asXML();
