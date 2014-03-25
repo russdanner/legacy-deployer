@@ -37,8 +37,10 @@ import org.springframework.beans.factory.annotation.Required;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
 
@@ -116,8 +118,13 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
                         }
                     } else {
                         File file = new File(root + fileName);
+                        Set<String> flattened = new HashSet<String>();
                         try {
-                            String flattenedXml = flattenXml(root, file);
+                            Document mergedDocument = flattenXml(root, file, flattened);
+                            String flattenedXml = mergedDocument.asXML();
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Merged XML:\n" + flattenedXml   );
+                            }
                             searchService.update(siteId, fileName, flattenedXml, true);
 
                             if (logger.isDebugEnabled()) {
@@ -134,31 +141,30 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
         }
     }
 
-    private String flattenXml(String root, File file) throws IOException, DocumentException, URISyntaxException {
+    private Document flattenXml(String root, File file, Set<String> flattenedFiles) throws IOException,
+        DocumentException, URISyntaxException {
+
         SAXReader reader = new SAXReader();
         SAXReader includeReader = new SAXReader();
 
         try {
-            String fileContents = FileUtils.readFileToString(file, charEncoding);
-
             reader.setEncoding(charEncoding);
-            String finalXml = "";
 
             Document document = reader.read(file);
             List<Element> includeElements = document.selectNodes(includeElementXPathQuery);
             if (CollectionUtils.isEmpty(includeElements)) {
-                return fileContents;
+                return document;
             }
             for (Element includeElement : includeElements) {
-                String includeSrcPath = root + "/" + includeElement.getTextTrim();
+                String includeSrcPath = root + File.separatorChar + includeElement.getTextTrim();
                 if (StringUtils.isEmpty(includeSrcPath)) {
                     continue;
                 }
 
                 File includeFile = new File(includeSrcPath);
                 if (includeFile != null && includeFile.exists()) {
-                    includeReader.setEncoding(charEncoding);
-                    Document includeDocument = includeReader.read(includeFile);
+                    flattenedFiles.add(includeSrcPath);
+                    Document includeDocument = flattenXml(root, includeFile, flattenedFiles);
 
                     if (logger.isDebugEnabled()) {
                         logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
@@ -168,8 +174,7 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
                 }
 
             }
-            finalXml = document.asXML();
-            return finalXml;
+            return document;
         } finally {
             reader.resetHandlers();
             reader = null;
