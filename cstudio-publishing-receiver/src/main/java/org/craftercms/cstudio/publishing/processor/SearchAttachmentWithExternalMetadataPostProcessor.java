@@ -122,7 +122,7 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                         logger.debug(String.format("Sending search update request for file %s [%s] for site %s",
                             updateIndexPath, filePath, siteId));
                     }
-                    searchService.partialDocumentUpdate(siteId, updateIndexPath, file, externalProperties);
+                    searchService.updateDocument(siteId, updateIndexPath, file, externalProperties);
                 }
             }
             searchService.commit();
