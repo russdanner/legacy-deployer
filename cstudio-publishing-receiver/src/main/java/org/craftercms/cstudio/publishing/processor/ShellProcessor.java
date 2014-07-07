@@ -124,10 +124,9 @@ public class ShellProcessor implements PublishingProcessor {
 			PublishedChangeSet changeSet) {
 		List<String> result = new ArrayList<String>();
 		if (sourceFiles == null) {
-			if (changeSet.getCreatedFiles() != null)
-				result = mergeList(changeSet.getCreatedFiles(),
-						changeSet.getDeletedFiles(),
-						changeSet.getUpdatedFiles());
+			result = mergeList(changeSet.getCreatedFiles(),
+					changeSet.getDeletedFiles(),
+					changeSet.getUpdatedFiles());
 			
 		} else if (sourceFiles.equalsIgnoreCase("UPDATED")) {
 			result = mergeList(changeSet.getUpdatedFiles());
@@ -209,22 +208,22 @@ public class ShellProcessor implements PublishingProcessor {
 	}
 
 	protected HashMap<String,String> buildArgumentsMap(List<String> files) {
-		 HashMap<String,String> result=new HashMap<String, String>(arguments);
-		if (result.get(INCLUDE_FILTER_PARAM) != null) {
+		HashMap<String,String> result=new HashMap<String, String>();
+		if (arguments != null)
+			result.putAll(arguments);
+		String filter = result.get(INCLUDE_FILTER_PARAM);
+		if (filter != null) {
 			List<String> filterFiles = new ArrayList<String>();
-			Pattern patter = Pattern.compile(arguments
-					.get(INCLUDE_FILTER_PARAM));
+			Pattern patter = Pattern.compile(filter);
 			for (String file : files) {
 				if (patter.matcher(file).matches()) {
-					LOGGER.debug("File " + file + " Match "
-							+ arguments.get(INCLUDE_FILTER_PARAM));
+					LOGGER.debug("File " + file + " Match " + filter);
 					filterFiles.add(file);
 				}else{
-					LOGGER.debug("File Don't "+file + " don't match " + arguments.get(INCLUDE_FILTER_PARAM));
+					LOGGER.debug("File Don't "+file + " don't match " + filter);
 				}
 			}
-			result
-					.put(INCLUDE_FILES_ARG, StringUtils.join(filterFiles, " "));
+			result.put(INCLUDE_FILES_ARG, StringUtils.join(filterFiles, " "));
 		}
 		return result;
 	}
@@ -269,6 +268,5 @@ public class ShellProcessor implements PublishingProcessor {
 		}
 		return mergeTo;
 	}
-
-	
+    	
 }
