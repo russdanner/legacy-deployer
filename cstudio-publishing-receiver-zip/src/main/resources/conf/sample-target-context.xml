@@ -53,6 +53,7 @@
 		</property>
 		<property name="includeElementXPathQuery" value="//include" />
 		<property name="charEncoding" value="UTF-8" />
+        <property name="disableFlatteningElement" value="disableFlattening" />
 	</bean>
 
 	<bean id="searchAttachmentProcessor"

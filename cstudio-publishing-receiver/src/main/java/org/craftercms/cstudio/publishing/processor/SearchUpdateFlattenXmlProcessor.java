@@ -49,6 +49,7 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
     private SearchService searchService;
     private String siteName;
     private String includeElementXPathQuery;
+    private String disableFlatteningElement = "disableFlattening";
     private String charEncoding = CharEncoding.UTF_8;
 
     @Required
@@ -68,6 +69,10 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
 
     public void setCharEncoding(String charEncoding) {
         this.charEncoding = charEncoding;
+    }
+
+    public void setDisableFlatteningElement(String disableFlatteningElement) {
+        this.disableFlatteningElement = disableFlatteningElement;
     }
 
     @Override
@@ -156,23 +161,31 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
                 return document;
             }
             for (Element includeElement : includeElements) {
-                String includeSrcPath = root + File.separatorChar + includeElement.getTextTrim();
-                if (StringUtils.isEmpty(includeSrcPath)) {
-                    continue;
+                boolean flatteningDisabled = false;
+                Element parent = includeElement.getParent();
+                Element disableFlatteningNode = parent.element(disableFlatteningElement);
+                if (disableFlatteningNode != null) {
+                    String disableFlattening = disableFlatteningNode.getText();
+                    flatteningDisabled = Boolean.parseBoolean(disableFlattening);
                 }
-
-                File includeFile = new File(includeSrcPath);
-                if (includeFile != null && includeFile.exists()) {
-                    flattenedFiles.add(includeSrcPath);
-                    Document includeDocument = flattenXml(root, includeFile, flattenedFiles);
-
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                if (!flatteningDisabled) {
+                    String includeSrcPath = root + File.separatorChar + includeElement.getTextTrim();
+                    if (StringUtils.isEmpty(includeSrcPath)) {
+                        continue;
                     }
 
-                    doInclude(includeElement, includeSrcPath, includeDocument);
-                }
+                    File includeFile = new File(includeSrcPath);
+                    if (includeFile != null && includeFile.exists()) {
+                        flattenedFiles.add(includeSrcPath);
+                        Document includeDocument = flattenXml(root, includeFile, flattenedFiles);
 
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                        }
+
+                        doInclude(includeElement, includeSrcPath, includeDocument);
+                    }
+                }
             }
             return document;
         } finally {
