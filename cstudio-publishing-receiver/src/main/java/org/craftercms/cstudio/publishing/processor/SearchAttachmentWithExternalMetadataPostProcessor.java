@@ -114,17 +114,17 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                     searchIndexUpdate = true;
                 }
             }
-            if (searchIndexUpdate) {
-                if(isDelete) {
-                    searchService.delete(siteId, updateIndexPath);
-                } else  {
-                    if (logger.isDebugEnabled()){
-                        logger.debug(String.format("Sending search update request for file %s [%s] for site %s",
-                            updateIndexPath, filePath, siteId));
-                    }
-                    searchService.updateDocument(siteId, updateIndexPath, file, externalProperties);
+
+            if(isDelete) {
+                searchService.delete(siteId, updateIndexPath);
+            } else if (searchIndexUpdate) {
+                if (logger.isDebugEnabled()){
+                    logger.debug(String.format("Sending search update request for file %s [%s] for site %s",
+                        updateIndexPath, filePath, siteId));
                 }
+                searchService.updateDocument(siteId, updateIndexPath, file, externalProperties);
             }
+
             searchService.commit();
         }
     }
