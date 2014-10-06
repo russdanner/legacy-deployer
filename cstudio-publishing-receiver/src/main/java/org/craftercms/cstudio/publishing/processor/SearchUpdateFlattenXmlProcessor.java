@@ -37,10 +37,7 @@ import org.springframework.beans.factory.annotation.Required;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
 
@@ -51,6 +48,12 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
     private String includeElementXPathQuery;
     private String disableFlatteningElement = "disableFlattening";
     private String charEncoding = CharEncoding.UTF_8;
+
+    private String tokenizeAttribute = "tokenized";
+    private Map<String, String> tokenizeSubstitutionMap = new HashMap<String, String>(){{
+        put("_s","_t");
+        put("_smv","_tmv");
+    }};
 
     @Required
     public void setSearchService(SearchService searchService) {
@@ -73,6 +76,14 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
 
     public void setDisableFlatteningElement(String disableFlatteningElement) {
         this.disableFlatteningElement = disableFlatteningElement;
+    }
+
+    public void setTokenizeAttribute(String tokenizeAttribute) {
+        this.tokenizeAttribute = tokenizeAttribute;
+    }
+
+    public void setTokenizeSubstitutionMap(Map<String, String> tokenizeSubstitutionMap) {
+        this.tokenizeSubstitutionMap = tokenizeSubstitutionMap;
     }
 
     @Override
@@ -126,7 +137,8 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
                         Set<String> flattened = new HashSet<String>();
                         try {
                             Document mergedDocument = flattenXml(root, file, flattened);
-                            String flattenedXml = mergedDocument.asXML();
+                            Document parsedDocument = parseTokenizeAttribute(mergedDocument);
+                            String flattenedXml = parsedDocument.asXML();
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Merged XML:\n" + flattenedXml   );
                             }
@@ -206,5 +218,39 @@ public class SearchUpdateFlattenXmlProcessor implements PublishingProcessor {
 
         // Add the src root element
         includeElementParentChildren.add(includeElementIdx, includeSrcRootElement);
+    }
+
+    private Document parseTokenizeAttribute(Document document) throws DocumentException, URISyntaxException {
+
+        String tokenizeXpath = String.format("//*[@%s=\"true\"]", tokenizeAttribute);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Using tokenize XPath: " + tokenizeXpath);
+        }
+        List<Element> tokenizeElements = document.selectNodes(tokenizeXpath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Number of elements found to perform tokenize parsing: " + tokenizeElements.size());
+        }
+
+        if (CollectionUtils.isEmpty(tokenizeElements)) {
+            return document;
+        }
+        for (Element tokenizeElement : tokenizeElements) {
+            Element parent = tokenizeElement.getParent();
+            String elemName = tokenizeElement.getName();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Parsing element: " + elemName);
+            }
+            for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
+                if (elemName.endsWith(substitutionKey)) {
+                    String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) + tokenizeSubstitutionMap.get(substitutionKey);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding new element for tokenized search: " + newElementName);
+                    }
+                    Element newElement = tokenizeElement.createCopy(newElementName);
+                    parent.add(newElement);
+                }
+            }
+        }
+        return document;
     }
 }
