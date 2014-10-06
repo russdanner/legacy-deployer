@@ -43,6 +43,13 @@
 			<value>sample</value>
 		</property>
 		<property name="charEncoding" value="UTF-8" />
+        <property name="tokenizeAttribute" value="tokenized"/>
+        <property name="tokenizeSubstitutionMap">
+            <map>
+                <entry key="_s" value="_t"/>
+                <entry key="_smv" value="_tmv"/>
+            </map>
+        </property>
 	</bean>
 
 	<bean id="searchFlattenXmlProcessor"
@@ -54,6 +61,13 @@
 		<property name="includeElementXPathQuery" value="//include" />
 		<property name="charEncoding" value="UTF-8" />
         <property name="disableFlatteningElement" value="disableFlattening" />
+        <property name="tokenizeAttribute" value="tokenized"/>
+        <property name="tokenizeSubstitutionMap">
+            <map>
+                <entry key="_s" value="_t"/>
+                <entry key="_smv" value="_tmv"/>
+            </map>
+        </property>
 	</bean>
 
 	<bean id="searchAttachmentProcessor"
@@ -149,6 +163,13 @@
             </list>
         </property>
         <property name="multivalueSeparator" value=","/>
+        <property name="tokenizeAttribute" value="tokenized"/>
+        <property name="tokenizeSubstitutionMap">
+            <map>
+                <entry key="_s" value="_t"/>
+                <entry key="_smv" value="_tmv"/>
+            </map>
+        </property>
     </bean>
 
 </beans>

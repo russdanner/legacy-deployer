@@ -2,6 +2,7 @@ package org.craftercms.cstudio.publishing.processor;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +36,13 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
     private List<String> metadataPathPatterns;
     private List<String> referenceXpathList;
     private String multivalueSeparator = ",";
+    private String charEncoding = CharEncoding.UTF_8;
 
+    private String tokenizeAttribute = "tokenized";
+    private Map<String, String> tokenizeSubstitutionMap = new HashMap<String, String>(){{
+        put("_s","_t");
+        put("_smv","_tmv");
+    }};
 
 
     @Override
@@ -94,6 +102,7 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Extracting properties.");
                             }
+                            Document parsedDocument = parseTokenizeAttribute(document);
                             externalProperties = parseMetadataFile(document);
                             file = new File(root + updateIndexPath);
                             if (!file.exists()) {
@@ -211,6 +220,40 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         return metadataFile;
     }
 
+    private Document parseTokenizeAttribute(Document document) throws DocumentException {
+
+        String tokenizeXpath = String.format("//*[@%s=\"true\"]", tokenizeAttribute);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Using tokenize XPath: " + tokenizeXpath);
+        }
+        List<Element> tokenizeElements = document.selectNodes(tokenizeXpath);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Number of elements found to perform tokenize parsing: " + tokenizeElements.size());
+        }
+
+        if (CollectionUtils.isEmpty(tokenizeElements)) {
+            return document;
+        }
+        for (Element tokenizeElement : tokenizeElements) {
+            Element parent = tokenizeElement.getParent();
+            String elemName = tokenizeElement.getName();
+            if (logger.isDebugEnabled()) {
+                logger.debug("Parsing element: " + elemName);
+            }
+            for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
+                if (elemName.endsWith(substitutionKey)) {
+                    String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) + tokenizeSubstitutionMap.get(substitutionKey);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding new element for tokenized search: " + newElementName);
+                    }
+                    Element newElement = tokenizeElement.createCopy(newElementName);
+                    parent.add(newElement);
+                }
+            }
+        }
+        return document;
+    }
+
 
     @Override
     public String getName() {
@@ -272,5 +315,17 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
 
     public void setMultivalueSeparator(final String multivalueSeparator) {
         this.multivalueSeparator = multivalueSeparator;
+    }
+
+    public void setCharEncoding(String charEncoding) {
+        this.charEncoding = charEncoding;
+    }
+
+    public void setTokenizeAttribute(String tokenizeAttribute) {
+        this.tokenizeAttribute = tokenizeAttribute;
+    }
+
+    public void setTokenizeSubstitutionMap(Map<String, String> tokenizeSubstitutionMap) {
+        this.tokenizeSubstitutionMap = tokenizeSubstitutionMap;
     }
 }
