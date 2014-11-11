@@ -49,10 +49,7 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
     public void doProcess(final PublishedChangeSet changeSet, final Map<String, String> parameters, final PublishingTarget target) throws PublishingException {
         String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = parameters.get(FileUploadServlet.PARAM_SITE);
-        if (StringUtils.isEmpty(siteId)) {
-            siteId = siteName;
-        }
+        String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);
 
         root += "/" + contentFolder;
         if (org.springframework.util.StringUtils.hasText(siteId)) {
@@ -265,8 +262,20 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         return siteName;
     }
 
-    public void setSiteName(final String siteName) {
-        this.siteName = siteName;
+    /**
+     * set a sitename to override in index
+     *
+     * @param siteName
+     *          an override siteName in index
+     */
+    public void setSiteName(String siteName) {
+        if (!StringUtils.isEmpty(siteName)) {
+            // check if it is preview for backward compatibility
+            if (!SITE_NAME_PREVIEW.equalsIgnoreCase(siteName)) {
+                if (logger.isDebugEnabled()) logger.debug("Overriding site name in index with " + siteName);
+                this.siteName = siteName;
+            }
+        }
     }
 
     public SearchService getSearchService() {
