@@ -30,6 +30,11 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  */
 public interface PublishingProcessor {
 
+    /**
+     * backward compatibility with old preview target configuration
+     */
+    final static String SITE_NAME_PREVIEW = "preview";
+
 	/**
 	 * process files published
 	 * 
