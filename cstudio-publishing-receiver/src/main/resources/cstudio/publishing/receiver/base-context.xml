@@ -60,6 +60,7 @@
                 <ref bean="StopServiceServletHolder" />
                 <ref bean="ReceiverStatusMonitoringServletHolder" />
                 <ref bean="ReceiverDeployVersionServletHolder"/>
+                <ref bean="ReprocessServiceServletHolder"/>
             </list>
         </property>
         <property name="servletMappings">
@@ -68,6 +69,7 @@
                 <ref bean="StopServiceServletMapping" />
                 <ref bean="ReceiverStatusMonitoringServletMapping" />
                 <ref bean="ReceiverrDeployVersionServletMapping" />
+                <ref bean="ReprocessServiceServletMapping" />
             </list>
         </property>
     </bean>
@@ -140,7 +142,28 @@
       	</bean>
       </property>
    </bean>
-    
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--    Reprocess Service Servlet	  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+
+    <bean id="ReprocessServiceServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="ReprocessServiceServlet" />
+        <property name="servlet" ref="ReprocessServiceServlet" />
+    </bean>
+
+    <bean id="ReprocessServiceServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="ReprocessServiceServlet"/>
+        <property name="pathSpec" ><value>${servlet.reprocessService.path}</value></property>
+    </bean>
+
+    <bean id="ReprocessServiceServlet" class="org.craftercms.cstudio.publishing.servlet.ReprocessServiceServlet">
+        <property name="targetManager" ref="TargetManager"/>
+        <property name="password"><value>${receiver.password}</value></property>
+    </bean>
+
     <!-- //////////////////////////////// -->
     <!-- 								  -->
     <!--	Stop Service Servlet		  -->
@@ -160,7 +183,7 @@
     <bean id="StopServiceServlet" class="org.craftercms.cstudio.publishing.servlet.StopServiceServlet">
         <property name="password"><value>${receiver.password}</value></property>
     </bean>
-    
+
     <!-- //////////////////////////////// -->
     <!-- 								  -->
     <!--		Deployment Targets		  -->
