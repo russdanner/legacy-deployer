@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--			 Properties			  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+    
+    <bean name="cstudioPublishingReceiverProperties"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath*:cstudio/publishing/receiver/server-config.properties</value>
+                <value>classpath*:conf/custom-receiver.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+    </bean>
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--			 Server 			  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+    
+    <bean id="Server" class="org.eclipse.jetty.server.Server">
+        <property name="connectors">
+            <list>
+                <ref bean="Connector" />
+            </list>
+        </property>
+
+        <property name="handler" ref="ReceiverServletContextHandler" />
+    </bean>
+
+    <bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+        <property name="port"><value>${receiver.port}</value></property>
+    </bean>
+
+    <bean id="ReceiverServletContextHandler" class="org.eclipse.jetty.servlet.ServletContextHandler">
+        <constructor-arg type="int"><value>1</value></constructor-arg>
+        <property name="contextPath" value="/" />
+        <property name="servletHandler" ref="ReceiverServletHandler" />
+    </bean>
+    
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--		Servlet Mapping			  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+    
+    <bean id="ReceiverServletHandler" class="org.eclipse.jetty.servlet.ServletHandler">
+        <property name="servlets">
+            <list>
+                <ref bean="ReceiverFileUploadServletHolder" />
+                <ref bean="StopServiceServletHolder" />
+                <ref bean="ReceiverStatusMonitoringServletHolder" />
+                <ref bean="ReceiverDeployVersionServletHolder"/>
+                <ref bean="ReprocessServiceServletHolder"/>
+            </list>
+        </property>
+        <property name="servletMappings">
+            <list>
+                <ref bean="ReceiverFileUploadServletMapping" />
+                <ref bean="StopServiceServletMapping" />
+                <ref bean="ReceiverStatusMonitoringServletMapping" />
+                <ref bean="ReceiverrDeployVersionServletMapping" />
+                <ref bean="ReprocessServiceServletMapping" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--	File Upload Servlet			  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+    
+    <bean id="ReceiverFileUploadServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="ReceiverFileUploadServlet" />
+        <property name="servlet" ref="ReceiverFileUploadServlet" />
+    </bean>
+
+    <bean id="ReceiverFileUploadServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="ReceiverFileUploadServlet"/>
+        <property name="pathSpec"><value>${servlet.fileUpload.path}</value></property>
+    </bean>
+
+    <bean id="ReceiverFileUploadServlet" class="org.craftercms.cstudio.publishing.servlet.FileUploadServlet">
+        <property name="targetManager" ref="TargetManager"/>
+        <property name="password"><value>${receiver.password}</value></property>
+    </bean>
+
+    <!-- //////////////////////////////////////// -->
+    <!-- 							        	  -->
+    <!--	Status Monitoring Servlet			  -->
+    <!-- 							        	  -->
+    <!-- //////////////////////////////////////// -->
+
+    <bean id="ReceiverStatusMonitoringServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="ReceiverStatusMonitoringServlet" />
+        <property name="servlet" ref="ReceiverStatusMonitoringServlet" />
+    </bean>
+
+    <bean id="ReceiverStatusMonitoringServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="ReceiverStatusMonitoringServlet"/>
+        <property name="pathSpec"><value>${servlet.statusMonitoring.path}</value></property>
+    </bean>
+
+    <bean id="ReceiverStatusMonitoringServlet" class="org.craftercms.cstudio.publishing.servlet.StatusMonitoringServlet">
+        <property name="statusMessage"><value>${servlet.statusMonitoring.statusMessage}</value></property>
+    </bean>
+    
+     <!-- //////////////////////////////////////// -->
+    <!-- 							        	  -->
+    <!--	DeploymentVersion Monitoring Servlet			  -->
+    <!-- 							        	  -->
+    <!-- //////////////////////////////////////// -->
+   <bean id="ReceiverDeployVersionServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="ReceiverDeployVersionServlet" />
+        <property name="servlet" ref="ReceiverDeployVersionServlet" />
+    </bean>
+
+    <bean id="ReceiverrDeployVersionServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="ReceiverDeployVersionServlet"/>
+        <property name="pathSpec"><value>${servlet.deplotment.version.path}</value></property>
+    </bean>
+   <bean id="ReceiverDeployVersionServlet" class="org.craftercms.cstudio.publishing.servlet.DeployVersionServlet">
+      <property name="versioningService">
+      	<bean class="org.craftercms.cstudio.publishing.version.VersioningService" init-method="init">
+      		<property name="targetManager" ref="TargetManager"/>
+      		<property name="charset">
+      			<value>${servlet.deployment.versionFileCharSet}</value>
+      		</property>
+      		<property name="fileName">
+      			<value>${servlet.deployment.versionFile}</value>
+      		</property>
+      	</bean>
+      </property>
+   </bean>
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--    Reprocess Service Servlet	  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+
+    <bean id="ReprocessServiceServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="ReprocessServiceServlet" />
+        <property name="servlet" ref="ReprocessServiceServlet" />
+    </bean>
+
+    <bean id="ReprocessServiceServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="ReprocessServiceServlet"/>
+        <property name="pathSpec" ><value>${servlet.reprocessService.path}</value></property>
+    </bean>
+
+    <bean id="ReprocessServiceServlet" class="org.craftercms.cstudio.publishing.servlet.ReprocessServiceServlet">
+        <property name="targetManager" ref="TargetManager"/>
+        <property name="password"><value>${receiver.password}</value></property>
+    </bean>
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--	Stop Service Servlet		  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+	
+    <bean id="StopServiceServletHolder" class="org.eclipse.jetty.servlet.ServletHolder">
+        <property name="name" value="StopServiceServlet" />
+        <property name="servlet" ref="StopServiceServlet" />
+    </bean>
+
+    <bean id="StopServiceServletMapping" class="org.eclipse.jetty.servlet.ServletMapping">
+        <property name="servletName" value="StopServiceServlet"/>
+        <property name="pathSpec" ><value>${servlet.stopService.path}</value></property>
+    </bean>
+
+    <bean id="StopServiceServlet" class="org.craftercms.cstudio.publishing.servlet.StopServiceServlet">
+        <property name="password"><value>${receiver.password}</value></property>
+    </bean>
+
+    <!-- //////////////////////////////// -->
+    <!-- 								  -->
+    <!--		Deployment Targets		  -->
+    <!-- 								  -->
+    <!-- //////////////////////////////// -->
+	
+    <bean id="TargetManager" class="org.craftercms.cstudio.publishing.target.TargetManager"/>
+
+
+	<import resource="classpath*:conf/*-target-context.xml" />
+
+</beans>
