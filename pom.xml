@@ -31,7 +31,7 @@
     <scm>
         <connection>scm:git:git://github.com/craftercms/deployer</connection>
         <developerConnection>scm:git:git://github.com/craftercms/deployer</developerConnection>
-        <url>scm:git:git://github.com/craftercms/core</url>
+        <url>scm:git:git://github.com/craftercms/deployer</url>
     </scm>
 
     <build>
