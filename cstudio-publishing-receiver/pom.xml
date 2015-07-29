@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.craftercms</groupId>
         <artifactId>crafter-studio-publishing-receiver-parent</artifactId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.5.1-SNAPSHOT</version>
     </parent>
 	
     <properties>
@@ -150,40 +150,42 @@
         <dependency>
         	<groupId>dom4j</groupId>
         	<artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
         </dependency>
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-client</artifactId>
-            <version>2.5.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-api</artifactId>
-            <version>2.5.0-SNAPSHOT</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
 		  <groupId>org.springframework</groupId>
 		  <artifactId>spring-beans</artifactId>
-          <!-- <version>${spring.version.local}</version> -->
+           <version>${spring.version.local}</version>
         </dependency>
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-core</artifactId>
-           <!-- <version>${spring.version.local}</version> -->
+            <version>${spring.version.local}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <!-- <version>${spring.version.local}</version> -->
+             <version>${spring.version.local}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
-            <!-- <version>${spring.version.local}</version> -->
+             <version>${spring.version.local}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
