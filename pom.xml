@@ -1,9 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project [
+        <!ELEMENT project (modelVersion|parent|groupId|artifactId|version|packaging|name|url|modules|organization|licenses|scm|build|profiles)*>
+        <!ATTLIST project
+                xmlns CDATA #REQUIRED
+                xmlns:xsi CDATA #REQUIRED
+                xsi:schemaLocation CDATA #REQUIRED>
+        <!ELEMENT modelVersion (#PCDATA)>
+        <!ELEMENT parent (groupId|artifactId|version)*>
+        <!ELEMENT groupId (#PCDATA)>
+        <!ELEMENT artifactId (#PCDATA)>
+        <!ELEMENT version (#PCDATA)>
+        <!ELEMENT packaging (#PCDATA)>
+        <!ELEMENT name (#PCDATA)>
+        <!ELEMENT url (#PCDATA)>
+        <!ELEMENT modules (module)*>
+        <!ELEMENT module (#PCDATA)>
+        <!ELEMENT organization (name|url)*>
+        <!ELEMENT licenses (license)*>
+        <!ELEMENT license (name|url|distribution)*>
+        <!ELEMENT distribution (#PCDATA)>
+        <!ELEMENT scm (connection|developerConnection|url)*>
+        <!ELEMENT connection (#PCDATA)>
+        <!ELEMENT developerConnection (#PCDATA)>
+        <!ELEMENT build (plugins)*>
+        <!ELEMENT plugins (plugin)*>
+        <!ELEMENT plugin (groupId|artifactId|version|executions|configuration)*>
+        <!ELEMENT executions (execution)*>
+        <!ELEMENT execution (id|goals|configuration|phase)*>
+        <!ELEMENT id (#PCDATA)>
+        <!ELEMENT goals (goal)*>
+        <!ELEMENT goal (#PCDATA)>
+        <!ELEMENT configuration (additionalparam|destFile|dataFile|propertyName|argLine|source|target|doCheck|doUpdate|revisionOnScmFailure|archive)*>
+        <!ELEMENT additionalparam (#PCDATA)>
+        <!ELEMENT profiles (profile)*>
+        <!ELEMENT profile (id|activation|build)*>
+        <!ELEMENT activation (property|jdk)*>
+        <!ELEMENT property (name|value)*>
+        <!ELEMENT destFile (#PCDATA)>
+        <!ELEMENT dataFile (#PCDATA)>
+        <!ELEMENT propertyName (#PCDATA)>
+        <!ELEMENT argLine (#PCDATA)>
+        <!ELEMENT jdk (#PCDATA)>
+        <!ELEMENT source (#PCDATA)>
+        <!ELEMENT target (#PCDATA)>
+        <!ELEMENT phase (#PCDATA)>
+        <!ELEMENT doCheck (#PCDATA)>
+        <!ELEMENT doUpdate (#PCDATA)>
+        <!ELEMENT revisionOnScmFailure (#PCDATA)>
+        <!ELEMENT archive (manifest|manifestEntries)*>
+        <!ELEMENT manifest (addDefaultImplementationEntries)*>
+        <!ELEMENT addDefaultImplementationEntries (#PCDATA)>
+        <!ELEMENT manifestEntries (Implementation-Build|Build-On)*>
+        <!ELEMENT Implementation-Build (#PCDATA)>
+        <!ELEMENT Build-On (#PCDATA)>
+        <!ELEMENT value (#PCDATA)>
+        ]>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
     <groupId>org.craftercms</groupId>
     <artifactId>crafter-studio-publishing-receiver-parent</artifactId>
     <version>2.5.1-SNAPSHOT</version>
