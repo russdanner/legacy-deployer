@@ -16,29 +16,29 @@
  */
 package org.craftercms.cstudio.publishing.processor;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.CharEncoding;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.craftercms.search.service.SearchService;
-import org.craftercms.cstudio.publishing.PublishedChangeSet;
-import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-import org.springframework.beans.factory.annotation.Required;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.craftercms.cstudio.publishing.PublishedChangeSet;
+import org.craftercms.cstudio.publishing.exception.PublishingException;
+import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
+import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.search.service.SearchService;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.annotation.Required;
 
 /**
  * Processor to update the Crafter Search engine index.
@@ -92,7 +92,8 @@ public class SearchUpdateProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
+    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target)
+        throws PublishingException {
         String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
         String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);
@@ -146,7 +147,8 @@ public class SearchUpdateProcessor implements PublishingProcessor {
                             searchService.update(siteId, fileName, parsedXml, true);
                         } else {
                             try {
-                                searchService.update(siteId, fileName, FileUtils.readFileToString(file, charEncoding), true);
+                                searchService.update(siteId, fileName, FileUtils.readFileToString(file, charEncoding),
+                                                     true);
 
                                 if (logger.isDebugEnabled()) {
                                     logger.debug(siteId + ":" + fileName + " added to search index");
@@ -196,7 +198,8 @@ public class SearchUpdateProcessor implements PublishingProcessor {
                 }
                 for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
                     if (elemName.endsWith(substitutionKey)) {
-                        String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) + tokenizeSubstitutionMap.get(substitutionKey);
+                        String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) +
+                                                tokenizeSubstitutionMap.get(substitutionKey);
                         if (logger.isDebugEnabled()) {
                             logger.debug("Adding new element for tokenized search: " + newElementName);
                         }
