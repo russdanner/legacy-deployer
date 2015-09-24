@@ -17,6 +17,7 @@
 package org.craftercms.cstudio.publishing.processor;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -46,13 +47,16 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
     @Override
     protected Document processDocument(String root, File file, Document document) throws DocumentException {
-        document = flattenXml(root, file, document);
+        document = flattenXml(root, file, document, new ArrayList<File>());
         document = super.processDocument(root, file, document);
 
         return document;
     }
 
-    protected Document flattenXml(String root, File file, Document document) throws DocumentException {
+    protected Document flattenXml(String root, File file, Document document,
+                                  List<File> flattenedFiles) throws DocumentException {
+        flattenedFiles.add(file);
+
         List<Element> includeElements = document.selectNodes(includeElementXPathQuery);
 
         if (CollectionUtils.isEmpty(includeElements)) {
@@ -77,14 +81,19 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
                 File includeFile = new File(includeSrcPath);
                 if (includeFile.exists()) {
-                    Document includeDocument = flattenXml(root, includeFile,
-                                                          XmlUtils.readXml(includeFile, charEncoding));
+                    if (!flattenedFiles.contains(includeFile)) {
+                        Document includeDocument = flattenXml(root, includeFile,
+                                                              XmlUtils.readXml(includeFile, charEncoding),
+                                                              flattenedFiles);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                        }
+
+                        doInclude(includeElement, includeDocument);
+                    } else {
+                        logger.warn("Circular inclusion detected. File " + includeFile + " already included");
                     }
-
-                    doInclude(includeElement, includeDocument);
                 } else {
                     logger.warn("No file found for include at " + includeFile);
                 }
@@ -104,6 +113,11 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
         // Add the src root element
         includeElementParentChildren.add(includeElementIdx, includeSrcRootElement);
+    }
+
+    @Override
+    public String getName() {
+        return SearchUpdateFlattenXmlProcessor.class.getSimpleName();
     }
 
 }

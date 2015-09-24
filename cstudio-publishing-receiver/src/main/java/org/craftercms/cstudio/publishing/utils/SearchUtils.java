@@ -16,8 +16,90 @@
  */
 package org.craftercms.cstudio.publishing.utils;
 
-/**
- * Created by alfonsovasquez on 21/9/15.
- */
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Document;
+import org.dom4j.Element;
+
 public class SearchUtils {
+
+    private static final Log logger = LogFactory.getLog(SearchUtils.class);
+
+    private SearchUtils() {
+    }
+
+    public static Document renameFields(Document document, Map<String, String> fieldMappings) {
+        if (MapUtils.isNotEmpty(fieldMappings)) {
+            for (Map.Entry<String, String> entry : fieldMappings.entrySet()) {
+                String xpath = entry.getKey();
+                String newName = entry.getValue();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Renaming elements that match XPath " + xpath + " to '" + newName + "'");
+                }
+
+                List<Element> elements = document.selectNodes(xpath);
+                if (CollectionUtils.isNotEmpty(elements)) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Number of elements found to rename: " + elements.size());
+                    }
+
+                    for (Element element : elements) {
+                        element.setName(newName);
+                    }
+                }
+            }
+        }
+
+        return document;
+    }
+
+    public static Document processTokenizeAttributes(Document document, String tokenizeAttribute,
+                                                     Map<String, String> tokenizeSubstitutionMap) {
+        if (MapUtils.isNotEmpty(tokenizeSubstitutionMap)) {
+            String tokenizeXpath = String.format("//*[@%s=\"true\"]", tokenizeAttribute);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Using tokenize XPath: " + tokenizeXpath);
+            }
+
+            List<Element> tokenizeElements = document.selectNodes(tokenizeXpath);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Number of elements found to perform tokenize parsing: " + tokenizeElements.size());
+            }
+
+            if (CollectionUtils.isEmpty(tokenizeElements)) {
+                return document;
+            }
+
+            for (Element tokenizeElement : tokenizeElements) {
+                Element parent = tokenizeElement.getParent();
+                String elemName = tokenizeElement.getName();
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Parsing element: " + elemName);
+                }
+
+                for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
+                    if (elemName.endsWith(substitutionKey)) {
+                        String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) +
+                                                tokenizeSubstitutionMap.get(substitutionKey);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Adding new element for tokenized search: " + newElementName);
+                        }
+
+                        Element newElement = tokenizeElement.createCopy(newElementName);
+                        parent.add(newElement);
+                    }
+                }
+            }
+        }
+
+        return document;
+    }
+
 }

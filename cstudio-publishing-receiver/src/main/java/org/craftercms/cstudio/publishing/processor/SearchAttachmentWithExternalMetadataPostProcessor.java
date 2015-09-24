@@ -2,7 +2,6 @@ package org.craftercms.cstudio.publishing.processor;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
 
 
     @Override
-    public void doProcess(final PublishedChangeSet changeSet, final Map<String, String> parameters, final PublishingTarget target) throws PublishingException {
+    public void doProcess(final PublishedChangeSet changeSet, final Map<String, String> parameters,
+                          final PublishingTarget target) throws PublishingException {
         String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
         String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);

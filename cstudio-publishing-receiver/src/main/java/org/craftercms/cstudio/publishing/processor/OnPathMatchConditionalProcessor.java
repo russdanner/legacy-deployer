@@ -78,7 +78,7 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
                 newChangeSet.setDeletedFiles(deletedFiles);
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Execution publishing processor " + processor.getName() + " for " + newChangeSet);
+                    logger.debug("Executing publishing processor " + processor.getName() + " for " + newChangeSet);
                 }
 
                 processor.doProcess(newChangeSet, parameters, target);
