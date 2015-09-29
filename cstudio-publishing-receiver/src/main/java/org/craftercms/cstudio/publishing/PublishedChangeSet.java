@@ -92,4 +92,14 @@ public class PublishedChangeSet {
 	public void setDeletedFiles(List<String> deletedFiles) {
 		this.deletedFiles = deletedFiles;
 	}
+
+	@Override
+	public String toString() {
+		return "PublishedChangeSet{" +
+			   "createdFiles=" + createdFiles +
+			   ", updatedFiles=" + updatedFiles +
+			   ", deletedFiles=" + deletedFiles +
+			   '}';
+	}
+
 }

@@ -16,29 +16,26 @@
  */
 package org.craftercms.cstudio.publishing.processor;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.craftercms.search.service.SearchService;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.cstudio.publishing.utils.SearchUtils;
+import org.craftercms.cstudio.publishing.utils.XmlUtils;
+import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Processor to update the Crafter Search engine index.
@@ -49,13 +46,14 @@ public class SearchUpdateProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchUpdateProcessor.class);
 
-    private SearchService searchService;
-    private String siteName;
-    private String charEncoding = CharEncoding.UTF_8;
-    private String tokenizeAttribute = "tokenized";
-    private Map<String, String> tokenizeSubstitutionMap = new HashMap<String, String>(){{
-        put("_s","_t");
-        put("_smv","_tmv");
+    protected SearchService searchService;
+    protected String siteName;
+    protected Map<String, String> fieldMappings;
+    protected String charEncoding = CharEncoding.UTF_8;
+    protected String tokenizeAttribute = "tokenized";
+    protected Map<String, String> tokenizeSubstitutionMap = new HashMap<String, String>() {{
+        put("_s", "_t");
+        put("_smv", "_tmv");
     }};
 
     @Required
@@ -66,17 +64,22 @@ public class SearchUpdateProcessor implements PublishingProcessor {
     /**
      * set a sitename to override in index
      *
-     * @param siteName
-     *          an override siteName in index
+     * @param siteName an override siteName in index
      */
     public void setSiteName(String siteName) {
         if (!StringUtils.isEmpty(siteName)) {
             // check if it is preview for backward compatibility
             if (!SITE_NAME_PREVIEW.equalsIgnoreCase(siteName)) {
-                if (logger.isDebugEnabled()) logger.debug("Overriding site name in index with " + siteName);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overriding site name in index with " + siteName);
+                }
                 this.siteName = siteName;
             }
         }
+    }
+
+    public void setFieldMappings(Map<String, String> fieldMappings) {
+        this.fieldMappings = fieldMappings;
     }
 
     public void setCharEncoding(String charEncoding) {
@@ -92,13 +95,15 @@ public class SearchUpdateProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
+    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
+                          PublishingTarget target) throws PublishingException {
         String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);
+        String siteId = (!StringUtils.isEmpty(siteName))? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
 
         root += "/" + contentFolder;
-        if (org.springframework.util.StringUtils.hasText(siteId)) {
+
+        if (StringUtils.isNotBlank(siteId)) {
             root = root.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);
         }
 
@@ -135,31 +140,18 @@ public class SearchUpdateProcessor implements PublishingProcessor {
                             logger.debug(siteId + ":" + fileName + " deleted from search index");
                         }
                     } else {
-                        File file = new File(root + fileName);
-                        if (fileName.endsWith(".xml")) {
-                            Document doc = parseTokenizeAttribute(file);
-                            String parsedXml = doc.asXML();
+                        try {
+                            String xml = processXml(root, fileName);
+
+                            searchService.update(siteId, fileName, xml, true);
+
                             if (logger.isDebugEnabled()) {
-                                logger.debug("Parsed XML:");
-                                logger.debug(parsedXml);
+                                logger.debug(siteId + ":" + fileName + " added to search index");
                             }
-                            searchService.update(siteId, fileName, parsedXml, true);
-                        } else {
-                            try {
-                                searchService.update(siteId, fileName, FileUtils.readFileToString(file, charEncoding), true);
-
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug(siteId + ":" + fileName + " added to search index");
-                                }
-                            } catch (IOException e) {
-                                logger.warn("Cannot read file [" + file + "]. Continuing index update...", e);
-                            }
+                        } catch (DocumentException e) {
+                            logger.warn("Cannot process XML file " + siteId + ":" + fileName + ". Continuing index " +
+                                        "update...", e);
                         }
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(siteId + ":" + fileName + " added to search index");
-                        }
-
                     }
                 } catch (Exception e) {
                     throw new PublishingException(e);
@@ -168,48 +160,33 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         }
     }
 
-    private Document parseTokenizeAttribute(File file) throws DocumentException, URISyntaxException {
+    protected String processXml(String root, String fileName) throws DocumentException {
+        File file = new File(root + fileName);
 
-        SAXReader reader = new SAXReader();
+        Document document = processDocument(root, file, XmlUtils.readXml(file, charEncoding));
+        String xml = document.asXML();
 
-        try {
-            reader.setEncoding(charEncoding);
-
-            Document document = reader.read(file);
-            String tokenizeXpath = String.format("//*[@%s=\"true\"]", tokenizeAttribute);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Using tokenize XPath: " + tokenizeXpath);
-            }
-            List<Element> tokenizeElements = document.selectNodes(tokenizeXpath);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Number of elements found to perform tokenize parsing: " + tokenizeElements.size());
-            }
-
-            if (CollectionUtils.isEmpty(tokenizeElements)) {
-                return document;
-            }
-            for (Element tokenizeElement : tokenizeElements) {
-                Element parent = tokenizeElement.getParent();
-                String elemName = tokenizeElement.getName();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Parsing element: " + elemName);
-                }
-                for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
-                    if (elemName.endsWith(substitutionKey)) {
-                        String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) + tokenizeSubstitutionMap.get(substitutionKey);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Adding new element for tokenized search: " + newElementName);
-                        }
-                        Element newElement = tokenizeElement.createCopy(newElementName);
-                        parent.add(newElement);
-                    }
-                }
-            }
-            return document;
-        } finally {
-            reader.resetHandlers();
-            reader = null;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Processed XML:");
+            logger.debug(xml);
         }
+
+        return xml;
+    }
+
+    protected Document processDocument(String root, File file, Document document) throws DocumentException {
+        document = renameFields(document);
+        document = processTokenizeAttributes(document);
+
+        return document;
+    }
+
+    protected Document renameFields(Document document) {
+        return SearchUtils.renameFields(document, fieldMappings);
+    }
+
+    protected Document processTokenizeAttributes(Document document) {
+        return SearchUtils.processTokenizeAttributes(document, tokenizeAttribute, tokenizeSubstitutionMap);
     }
 
 }

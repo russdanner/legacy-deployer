@@ -16,22 +16,22 @@
  */
 package org.craftercms.cstudio.publishing.processor;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.craftercms.search.service.SearchService;
-import org.craftercms.cstudio.publishing.PublishedChangeSet;
-import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
-import org.springframework.beans.factory.annotation.Required;
-
-import javax.activation.MimetypesFileTypeMap;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import javax.activation.MimetypesFileTypeMap;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.craftercms.cstudio.publishing.PublishedChangeSet;
+import org.craftercms.cstudio.publishing.exception.PublishingException;
+import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
+import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.search.service.SearchService;
+import org.springframework.beans.factory.annotation.Required;
 
 public class SearchAttachmentProcessor implements PublishingProcessor {
 
@@ -44,14 +44,15 @@ public class SearchAttachmentProcessor implements PublishingProcessor {
     /**
      * set a sitename to override in index
      *
-     * @param siteName
-     *          an override siteName in index
+     * @param siteName an override siteName in index
      */
     public void setSiteName(String siteName) {
         if (!StringUtils.isEmpty(siteName)) {
             // check if it is preview for backward compatibility
             if (!SITE_NAME_PREVIEW.equalsIgnoreCase(siteName)) {
-                if (logger.isDebugEnabled()) logger.debug("Overriding site name in index with " + siteName);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Overriding site name in index with " + siteName);
+                }
                 this.siteName = siteName;
             }
         }
@@ -68,10 +69,11 @@ public class SearchAttachmentProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
+    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
+                          PublishingTarget target) throws PublishingException {
         String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);
+        String siteId = (!StringUtils.isEmpty(siteName))? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
 
         root += "/" + contentFolder;
         if (org.springframework.util.StringUtils.hasText(siteId)) {
@@ -97,8 +99,7 @@ public class SearchAttachmentProcessor implements PublishingProcessor {
         }
     }
 
-    private void update(String siteId, String root, List<String> fileList, boolean isDelete)
-        throws IOException {
+    private void update(String siteId, String root, List<String> fileList, boolean isDelete) throws IOException {
         for (String fileName : fileList) {
             String mimeType = null;
             File file = new File(root + fileName);

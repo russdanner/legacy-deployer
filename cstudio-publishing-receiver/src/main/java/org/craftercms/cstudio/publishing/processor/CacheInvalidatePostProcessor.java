@@ -16,6 +16,10 @@
  */
 package org.craftercms.cstudio.publishing.processor;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -24,10 +28,6 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * Post processor that invalidates crafter cache
@@ -45,18 +45,20 @@ public class CacheInvalidatePostProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
+    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
+                          PublishingTarget target) throws PublishingException {
         HttpMethod cacheInvalidateGetMethod = new GetMethod(_cacheInvalidateUrl);
         HttpClient client = new HttpClient();
         try {
             int status = client.executeMethod(cacheInvalidateGetMethod);
             if (status != HttpServletResponse.SC_OK) {
-                throw new PublishingException("Unable to invalidate cache: URL " + _cacheInvalidateUrl + " returned status '" +
-                        cacheInvalidateGetMethod.getStatusText() + "' with body \n" + cacheInvalidateGetMethod.getResponseBodyAsString());
+                throw new PublishingException("Unable to invalidate cache: URL " + _cacheInvalidateUrl +
+                                              " returned status '" + cacheInvalidateGetMethod.getStatusText() +
+                                              "' with body \n" + cacheInvalidateGetMethod.getResponseBodyAsString());
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Cache invalidated: URL " + _cacheInvalidateUrl + " returned status '" +
-                            cacheInvalidateGetMethod.getStatusText() + "'");
+                                 cacheInvalidateGetMethod.getStatusText() + "'");
                 }
             }
         } catch (IOException e) {
