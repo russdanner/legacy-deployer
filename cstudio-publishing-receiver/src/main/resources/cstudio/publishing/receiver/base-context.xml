@@ -72,6 +72,34 @@
                 <ref bean="ReprocessServiceServletMapping" />
             </list>
         </property>
+        <property name="filters">
+            <list>
+                <ref bean="crafter.corsFilterHolder"/>
+            </list>
+        </property>
+        <property name="filterMappings">
+            <list>
+                <ref bean="crafter.corsFilterMapping"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.eclipse.jetty.servlet.FilterHolder" id="crafter.corsFilterHolder">
+        <property name="name" value="crafter.corsFilter"/>
+        <property name="filter" ref="crafter.corsFilter"/>
+    </bean>
+
+    <bean class="org.eclipse.jetty.servlet.FilterMapping" id="crafter.corsFilterMapping">
+        <property name="filterName" value="crafter.corsFilter"/>
+        <property name="pathSpec" value="${crafter.deployer.system.cors.path}"/>
+    </bean>
+
+    <bean class="org.craftercms.commons.web.CORSFilter" id="crafter.corsFilter">
+        <property name="allowHeaders" value="${crafter.deployer.system.cors.accessControlAllowHeaders}"/>
+        <property name="allowMethods" value="${crafter.deployer.system.cors.accessControlAllowMethods}" />
+        <property name="allowOrigins" value="${crafter.deployer.system.cors.accessControlAllowOrigin}"/>
+        <property name="maxAge" value="${crafter.deployer.system.cors.accessControlMaxAge}"/>
+        <property name="allowCredentials" value="${crafter.deployer.system.cors.accessControlAllowCredentials}"/>
     </bean>
 
     <!-- //////////////////////////////// -->
