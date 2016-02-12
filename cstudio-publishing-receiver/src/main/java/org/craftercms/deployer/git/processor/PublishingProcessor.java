@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.util.Map;
+package org.craftercms.deployer.git.processor;
 
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
+
+import java.util.Map;
 
 /**
  * processor that runs before or after publishing
@@ -43,7 +44,7 @@ public interface PublishingProcessor {
 	 * @param target
 	 * @throws PublishingException
 	 */
-	public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException;
+	public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException;
 	
 	/**
 	 * get the process's name

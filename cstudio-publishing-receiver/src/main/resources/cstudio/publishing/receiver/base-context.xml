@@ -212,6 +212,38 @@
         <property name="password"><value>${receiver.password}</value></property>
     </bean>
 
+
+    <!-- Git deployer -->
+    <bean id="gitRepoDeployerJob" class="org.craftercms.deployer.git.GitBasedDeployer">
+        <property name="siteConfigurationLoader" ref="siteConfigurationLoader"/>
+        <property name="enabled" value="${crafter.deployer.git.enabled}"/>
+    </bean>
+
+    <bean id="siteConfigurationLoader" class="org.craftercms.deployer.git.config.SiteConfigurationLoader">
+        <property name="configurationLocation" value="sites"/>
+    </bean>
+
+    <!-- scheduled actions -->
+    <bean id="gitRepoDeployerJobSchedule" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject" ref="gitRepoDeployerJob"/>
+                <property name="targetMethod" value="execute"/>
+                <property name="concurrent" value="false"/>
+            </bean>
+        </property>
+        <property name="repeatInterval" value="${crafter.deployer.git.job.interval}" />
+        <property name="startDelay" value="${crafter.deployer.git.job.startDelay}" />
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="gitRepoDeployerJobSchedule" />
+            </list>
+        </property>
+    </bean>
+
     <!-- //////////////////////////////// -->
     <!-- 								  -->
     <!--		Deployment Targets		  -->

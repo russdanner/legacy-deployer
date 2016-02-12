@@ -1,4 +1,4 @@
-package org.craftercms.cstudio.publishing.processor;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpClient;
@@ -10,8 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -104,12 +103,9 @@ public class EmailProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet,
-                          Map<String, String> parameters, PublishingTarget target) throws PublishingException {
-        String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
-        String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        root += "/" + contentFolder;
-        String siteId = StringUtils.isEmpty(getSiteName()) ? parameters.get(FileUploadServlet.PARAM_SITE) : getSiteName();
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        String root = siteConfiguration.getLocalRepositoryRoot();
+        String siteId = siteConfiguration.getSiteId();
         processFiles(siteId, root, changeSet.getCreatedFiles());
         processFiles(siteId, root, changeSet.getUpdatedFiles());
     }
