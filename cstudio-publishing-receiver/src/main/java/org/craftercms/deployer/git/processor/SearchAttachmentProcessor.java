@@ -14,13 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import javax.activation.MimetypesFileTypeMap;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -30,8 +24,15 @@ import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Required;
+
+import javax.activation.MimetypesFileTypeMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class SearchAttachmentProcessor implements PublishingProcessor {
 
@@ -73,13 +74,10 @@ public class SearchAttachmentProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
-        String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
-        String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = (!StringUtils.isEmpty(siteName))? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        String root = siteConfiguration.getLocalRepositoryRoot();
+        String siteId = (!StringUtils.isEmpty(siteName))? siteName: siteConfiguration.getSiteId();
 
-        root += "/" + contentFolder;
         if (org.springframework.util.StringUtils.hasText(siteId)) {
             root = root.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);
         }

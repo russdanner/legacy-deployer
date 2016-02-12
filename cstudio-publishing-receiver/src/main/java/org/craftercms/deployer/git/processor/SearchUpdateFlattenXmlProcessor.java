@@ -14,11 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -29,6 +25,10 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 

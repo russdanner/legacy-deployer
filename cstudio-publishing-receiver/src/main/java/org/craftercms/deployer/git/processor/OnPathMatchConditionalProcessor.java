@@ -1,10 +1,4 @@
-package org.craftercms.cstudio.publishing.processor;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -13,8 +7,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.util.*;
 
 /**
  * {@link PublishingProcessor} decorator that maps file path patterns to post processors, so if files of the change
@@ -40,8 +36,7 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
         List<String> createdFiles = copyFileList(changeSet.getCreatedFiles());
         List<String> updatedFiles = copyFileList(changeSet.getUpdatedFiles());
         List<String> deletedFiles = copyFileList(changeSet.getDeletedFiles());
@@ -87,7 +82,7 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
                     logger.debug("Executing publishing processor " + processor.getName() + " for " + newChangeSet);
                 }
 
-                processor.doProcess(newChangeSet, parameters, target);
+                processor.doProcess(siteConfiguration, newChangeSet);
             }
         }
     }

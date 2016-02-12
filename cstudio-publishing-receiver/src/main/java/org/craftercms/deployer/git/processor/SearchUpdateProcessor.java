@@ -14,12 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -32,10 +27,16 @@ import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.cstudio.publishing.utils.SearchUtils;
 import org.craftercms.cstudio.publishing.utils.XmlUtils;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Processor to update the Crafter Search engine index.
@@ -124,13 +125,9 @@ public class SearchUpdateProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
-        String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
-        String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = (!StringUtils.isEmpty(siteName))? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
-
-        root += "/" + contentFolder;
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        String root = siteConfiguration.getLocalRepositoryRoot();
+        String siteId = (!StringUtils.isEmpty(siteName))? siteName: siteConfiguration.getSiteId();
 
         if (StringUtils.isNotBlank(siteId)) {
             root = root.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);

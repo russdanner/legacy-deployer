@@ -1,27 +1,19 @@
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.IOException;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletResponse;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.HeadMethod;
-import org.apache.commons.httpclient.methods.OptionsMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.TraceMethod;
+import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.springframework.beans.factory.annotation.Required;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * {@link PublishingProcessor} that does an HTTP method call to a specified URL. Any occurrences of {siteName} are
@@ -60,10 +52,9 @@ public class HttpMethodCallPostProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
         String url = this.url;
-        String siteId = StringUtils.isNotEmpty(siteName)? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
+        String siteId = StringUtils.isNotEmpty(siteName)? siteName: siteConfiguration.getSiteId();
 
         if (StringUtils.isNotEmpty(siteId)) {
             url = url.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);
