@@ -75,6 +75,34 @@
                 <ref bean="ReprocessServiceServletMapping" />
             </list>
         </property>
+        <property name="filters">
+            <list>
+                <ref bean="crafter.corsFilterHolder"/>
+            </list>
+        </property>
+        <property name="filterMappings">
+            <list>
+                <ref bean="crafter.corsFilterMapping"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.eclipse.jetty.servlet.FilterHolder" id="crafter.corsFilterHolder">
+        <property name="name" value="crafter.corsFilter"/>
+        <property name="filter" ref="crafter.corsFilter"/>
+    </bean>
+
+    <bean class="org.eclipse.jetty.servlet.FilterMapping" id="crafter.corsFilterMapping">
+        <property name="filterName" value="crafter.corsFilter"/>
+        <property name="pathSpec" value="${crafter.deployer.system.cors.path}"/>
+    </bean>
+
+    <bean class="org.craftercms.commons.web.CORSFilter" id="crafter.corsFilter">
+        <property name="allowHeaders" value="${crafter.deployer.system.cors.accessControlAllowHeaders}"/>
+        <property name="allowMethods" value="${crafter.deployer.system.cors.accessControlAllowMethods}" />
+        <property name="allowOrigins" value="${crafter.deployer.system.cors.accessControlAllowOrigin}"/>
+        <property name="maxAge" value="${crafter.deployer.system.cors.accessControlMaxAge}"/>
+        <property name="allowCredentials" value="${crafter.deployer.system.cors.accessControlAllowCredentials}"/>
     </bean>
 
     <!-- //////////////////////////////// -->
@@ -185,6 +213,38 @@
 
     <bean id="StopServiceServlet" class="org.craftercms.cstudio.publishing.servlet.StopServiceServlet">
         <property name="password"><value>${receiver.password}</value></property>
+    </bean>
+
+
+    <!-- Git deployer -->
+    <bean id="gitRepoDeployerJob" class="org.craftercms.deployer.git.GitBasedDeployer">
+        <property name="siteConfigurationLoader" ref="siteConfigurationLoader"/>
+        <property name="enabled" value="${crafter.deployer.git.enabled}"/>
+    </bean>
+
+    <bean id="siteConfigurationLoader" class="org.craftercms.deployer.git.config.SiteConfigurationLoader">
+        <property name="configurationLocation" value="sites"/>
+    </bean>
+
+    <!-- scheduled actions -->
+    <bean id="gitRepoDeployerJobSchedule" class="org.springframework.scheduling.quartz.SimpleTriggerFactoryBean">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject" ref="gitRepoDeployerJob"/>
+                <property name="targetMethod" value="execute"/>
+                <property name="concurrent" value="false"/>
+            </bean>
+        </property>
+        <property name="repeatInterval" value="${crafter.deployer.git.job.interval}" />
+        <property name="startDelay" value="${crafter.deployer.git.job.startDelay}" />
+    </bean>
+
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="gitRepoDeployerJobSchedule" />
+            </list>
+        </property>
     </bean>
 
     <!-- //////////////////////////////// -->

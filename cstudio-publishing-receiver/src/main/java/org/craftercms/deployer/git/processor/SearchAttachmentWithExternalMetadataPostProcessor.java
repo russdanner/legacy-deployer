@@ -1,12 +1,4 @@
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.CharEncoding;
@@ -16,13 +8,21 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchAttachmentWithExternalMetadataPostProcessor implements PublishingProcessor {
 
@@ -45,13 +45,10 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
     protected int order = Integer.MAX_VALUE;
 
     @Override
-    public void doProcess(final PublishedChangeSet changeSet, final Map<String, String> parameters,
-                          final PublishingTarget target) throws PublishingException {
-        String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
-        String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
-        String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : parameters.get(FileUploadServlet.PARAM_SITE);
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        String root = siteConfiguration.getLocalRepositoryRoot();
+        String siteId = (!StringUtils.isEmpty(siteName)) ? siteName : siteConfiguration.getSiteId();
 
-        root += "/" + contentFolder;
         if (org.springframework.util.StringUtils.hasText(siteId)) {
             root = root.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);
         }

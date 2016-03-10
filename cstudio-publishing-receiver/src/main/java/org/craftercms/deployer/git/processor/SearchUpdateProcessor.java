@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
+package org.craftercms.deployer.git.processor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
+import org.craftercms.cstudio.publishing.processor.PublishingProcessor;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.cstudio.publishing.utils.XmlUtils;

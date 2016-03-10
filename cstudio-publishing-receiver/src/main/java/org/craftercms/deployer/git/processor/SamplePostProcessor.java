@@ -14,15 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.util.Map;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
+
+import java.util.Map;
 
 /**
  * a sample post processor that logs a list of files published 
@@ -33,13 +34,12 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
 public class SamplePostProcessor implements PublishingProcessor {
 
 	private static Log LOGGER = LogFactory.getLog(SamplePostProcessor.class);
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#doProcess(org.craftercms.cstudio.publishing.PublishedChangeSet, java.util.Map, org.craftercms.cstudio.publishing.target.PublishingTarget)
-	 */
+    /*
+         * (non-Javadoc)
+         * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#doProcess(org.craftercms.cstudio.publishing.PublishedChangeSet, java.util.Map, org.craftercms.cstudio.publishing.target.PublishingTarget)
+         */
 	@Override
-	public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
 		if (LOGGER.isInfoEnabled()) {
 			if (changeSet != null) {
 				LOGGER.info("Printing the list of files deployed.");

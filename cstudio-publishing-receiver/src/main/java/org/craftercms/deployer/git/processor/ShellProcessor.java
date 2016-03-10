@@ -14,19 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -35,7 +23,14 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class ShellProcessor implements PublishingProcessor {
 
@@ -51,14 +46,13 @@ public class ShellProcessor implements PublishingProcessor {
     protected int order = Integer.MAX_VALUE;
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
-        checkConfiguration(parameters, target);
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        checkConfiguration(siteConfiguration);
         LOGGER.debug("Starting Shell Processor");
         ProcessBuilder builder = new ProcessBuilder();
-        builder.directory(getWorkingDir(workingDir, parameters.get(FileUploadServlet.PARAM_SITE)));
+        builder.directory(getWorkingDir(workingDir, siteConfiguration.getSiteId()));
         LOGGER.debug("Working directory is " + workingDir);
-        HashMap<String, String> argumentsMap = buildArgumentsMap(getFileList(parameters, changeSet));
+        HashMap<String, String> argumentsMap = buildArgumentsMap(getFileList(changeSet));
         if (asSingleCommand) {
             StrSubstitutor substitutor = new StrSubstitutor(argumentsMap, "%{", "}");
             String execComand = substitutor.replace(command);
@@ -125,7 +119,7 @@ public class ShellProcessor implements PublishingProcessor {
      * <b> Empty</b> if {@link FILES_SOURCE} is no valid
      */
     @SuppressWarnings("unchecked")
-    private List<String> getFileList(Map<String, String> parameters, PublishedChangeSet changeSet) {
+    private List<String> getFileList(PublishedChangeSet changeSet) {
         List<String> result = new ArrayList<String>();
         if (sourceFiles == null) {
             result = mergeList(changeSet.getCreatedFiles(), changeSet.getDeletedFiles(), changeSet.getUpdatedFiles());
@@ -157,14 +151,14 @@ public class ShellProcessor implements PublishingProcessor {
      * @param target     Target in which the processor is running
      * @throws PublishingException If some of the given configuration is wrong
      */
-    private void checkConfiguration(Map<String, String> parameters, PublishingTarget target) throws
+    private void checkConfiguration(SiteConfiguration siteConfiguration) throws
         PublishingException {
         if (workingDir == null) {
             // Set a default one
-            workingDir = buildContentPath(target);
+            workingDir = buildContentPath(siteConfiguration);
             LOGGER.debug("working Dir is not set, using " + workingDir + " as default");
         } else {
-            if (!getWorkingDir(workingDir, parameters.get(FileUploadServlet.PARAM_SITE)).exists()) {
+            if (!getWorkingDir(workingDir, siteConfiguration.getSiteId()).exists()) {
                 LOGGER.error("The path " + workingDir + " does not exist");
                 throw new PublishingException("The path " + workingDir + " does not exist");
             }
@@ -191,17 +185,15 @@ public class ShellProcessor implements PublishingProcessor {
      * @return Relative to working directory path of where the content should be
      * @throws PublishingException If Working dir can't be calculated
      */
-    protected String buildContentPath(PublishingTarget target) throws PublishingException {
+    protected String buildContentPath(SiteConfiguration siteConfiguration) throws PublishingException {
         LOGGER.debug("Building root Path");
         File directory = new File(".");
         String path = "";
-        if (new File(target.getParameter(FileUploadServlet.CONFIG_ROOT)).exists()) {
-            path = target.getParameter(FileUploadServlet.CONFIG_ROOT) + File.separator + target.getParameter
-                (FileUploadServlet.CONFIG_CONTENT_FOLDER);
+        if (new File(siteConfiguration.getLocalRepositoryRoot()).exists()) {
+            path = siteConfiguration.getLocalRepositoryRoot();
         } else {
             path = directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File
-                .separator + target.getParameter(FileUploadServlet.CONFIG_ROOT) + File.separator + target
-                .getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
+                .separator + siteConfiguration.getLocalRepositoryRoot();
         }
         LOGGER.debug("Build path is " + path);
         return path;

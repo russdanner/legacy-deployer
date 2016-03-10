@@ -1,14 +1,13 @@
-package org.craftercms.cstudio.publishing.processor;
-
-import java.util.Map;
+package org.craftercms.deployer.git.processor;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
+import org.craftercms.deployer.git.config.SiteConfiguration;
+
+import java.util.Map;
 
 /**
  * {@link PublishingProcessor} decorator that executes a different processor per site, or if there's no processor
@@ -38,9 +37,8 @@ public class PerSiteConditionalProcessor implements PublishingProcessor {
     }
 
     @Override
-    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
-                          PublishingTarget target) throws PublishingException {
-        String siteId = parameters.get(FileUploadServlet.PARAM_SITE);
+    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+        String siteId = siteConfiguration.getSiteId();
         PublishingProcessor processor = null;
 
         if (MapUtils.isNotEmpty(processorMappings)) {
@@ -56,7 +54,7 @@ public class PerSiteConditionalProcessor implements PublishingProcessor {
                 logger.debug("Executing publishing processor " + processor.getName() + " for site " + siteId);
             }
 
-            processor.doProcess(changeSet, parameters, target);
+            processor.doProcess(siteConfiguration, changeSet);
         }
     }
 

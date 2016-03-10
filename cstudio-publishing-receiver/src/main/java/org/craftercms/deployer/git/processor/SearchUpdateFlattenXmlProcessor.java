@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.craftercms.cstudio.publishing.processor;
+package org.craftercms.deployer.git.processor;
 
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.craftercms.cstudio.publishing.processor.SearchUpdateProcessor;
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
 import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessor;
 

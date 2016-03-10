@@ -1,0 +1,21 @@
+name:                   sample
+siteId:                 sample
+localRepositoryRoot:    target/sample
+gitRepositoryUrl:       git://github.com/sample/sample.git
+liveSiteUrl:            http://localhost:8080
+searchServiceUrl:       http://127.0.0.1:8080/crafter-search
+postProcessors:
+    - !!org.craftercms.deployer.git.processor.SearchUpdateFlattenXmlProcessor
+        charEncoding: UTF-8
+        disableFlatteningElement: disableFlattening
+        includeElementXPathQuery: //include
+        searchService: !!org.craftercms.search.service.impl.RestClientSearchService {
+            serverUrl: 'http://127.0.0.1:8080/crafter-search'
+        }
+        siteName: sample
+        tokenizeAttribute: tokenized
+        tokenizeSubstitutionMap: {
+             _smv: _tmv,
+             _s: _t
+        }
+    - !!org.craftercms.deployer.git.processor.SamplePostProcessor {}
