@@ -16,26 +16,16 @@
  */
 package org.craftercms.cstudio.publishing.processor;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
+import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessor;
 
 public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
-    private static final Log logger = LogFactory.getLog(SearchUpdateFlattenXmlProcessor.class);
-
-    protected String includeElementXPathQuery = "//include";
-    protected String disableFlatteningElement = "disableFlattening";
+    protected String includeElementXPathQuery;
+    protected String disableFlatteningElement;
 
     public void setIncludeElementXPathQuery(String includeElementXPathQuery) {
         this.includeElementXPathQuery = includeElementXPathQuery;
@@ -46,73 +36,18 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
     }
 
     @Override
-    protected Document processDocument(String root, File file, Document document) throws DocumentException {
-        document = flattenXml(root, file, document, new ArrayList<File>());
-        document = super.processDocument(root, file, document);
-
-        return document;
-    }
-
-    protected Document flattenXml(String root, File file, Document document,
-                                  List<File> flattenedFiles) throws DocumentException {
-        flattenedFiles.add(file);
-
-        List<Element> includeElements = document.selectNodes(includeElementXPathQuery);
-
-        if (CollectionUtils.isEmpty(includeElements)) {
-            return document;
+    protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
+        FlatteningDocumentProcessor processor = new FlatteningDocumentProcessor();
+        if (StringUtils.isNotEmpty(includeElementXPathQuery)) {
+            processor.setIncludeElementXPathQuery(includeElementXPathQuery);
+        }
+        if (StringUtils.isNotEmpty(disableFlatteningElement)) {
+            processor.setDisableFlatteningElement(disableFlatteningElement);
         }
 
-        for (Element includeElement : includeElements) {
-            boolean flatteningDisabled = false;
-            Element parent = includeElement.getParent();
-            Element disableFlatteningNode = parent.element(disableFlatteningElement);
+        chain.add(processor);
 
-            if (disableFlatteningNode != null) {
-                String disableFlattening = disableFlatteningNode.getText();
-                flatteningDisabled = Boolean.parseBoolean(disableFlattening);
-            }
-
-            if (!flatteningDisabled) {
-                String includeSrcPath = root + File.separatorChar + includeElement.getTextTrim();
-                if (StringUtils.isEmpty(includeSrcPath)) {
-                    continue;
-                }
-
-                File includeFile = new File(includeSrcPath);
-                if (includeFile.exists()) {
-                    if (!flattenedFiles.contains(includeFile)) {
-                        Document includeDocument = flattenXml(root, includeFile,
-                                                              XmlUtils.readXml(includeFile, charEncoding),
-                                                              flattenedFiles);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
-                        }
-
-                        doInclude(includeElement, includeDocument);
-                    } else {
-                        logger.warn("Circular inclusion detected. File " + includeFile + " already included");
-                    }
-                } else {
-                    logger.warn("No file found for include at " + includeFile);
-                }
-            }
-        }
-
-        return document;
-    }
-
-    private void doInclude(Element includeElement, Document includeSrc) {
-        List<Node> includeElementParentChildren = includeElement.getParent().content();
-        int includeElementIdx = includeElementParentChildren.indexOf(includeElement);
-        Element includeSrcRootElement = includeSrc.getRootElement().createCopy();
-
-        // Remove the <include> element
-        includeElementParentChildren.remove(includeElementIdx);
-
-        // Add the src root element
-        includeElementParentChildren.add(includeElementIdx, includeSrcRootElement);
+        return super.createDocumentProcessorChain(chain);
     }
 
     @Override
