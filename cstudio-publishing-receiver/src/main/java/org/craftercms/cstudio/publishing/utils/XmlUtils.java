@@ -30,6 +30,7 @@ public class XmlUtils {
     public static Document readXml(File file, String encoding) throws DocumentException {
         SAXReader reader = new SAXReader();
         reader.setEncoding(encoding);
+        reader.setMergeAdjacentText(true);
 
         return reader.read(file);
     }

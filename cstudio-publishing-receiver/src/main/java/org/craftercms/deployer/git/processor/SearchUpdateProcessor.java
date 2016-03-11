@@ -16,27 +16,31 @@
  */
 package org.craftercms.deployer.git.processor;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.CharEncoding;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
+import org.craftercms.cstudio.publishing.processor.PublishingProcessor;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
-import org.craftercms.cstudio.publishing.utils.SearchUtils;
 import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.craftercms.deployer.git.config.SiteConfiguration;
+import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
+import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessorChain;
+import org.craftercms.cstudio.publishing.utils.xml.FieldRenamingDocumentProcessor;
+import org.craftercms.cstudio.publishing.utils.xml.TokenizeAttributeParsingDocumentProcessor;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.springframework.beans.factory.annotation.Required;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Processor to update the Crafter Search engine index.
@@ -47,44 +51,14 @@ public class SearchUpdateProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchUpdateProcessor.class);
 
+    protected int order;
     protected SearchService searchService;
     protected String siteName;
     protected Map<String, String> fieldMappings;
-    protected String charEncoding = CharEncoding.UTF_8;
-    protected String tokenizeAttribute = "tokenized";
-    protected Map<String, String> tokenizeSubstitutionMap = new HashMap<String, String>() {{
-        put("_s", "_t");
-        put("_smv", "_tmv");
-    }};
-    protected int order = Integer.MAX_VALUE;
-
-    public SearchService getSearchService() {
-        return searchService;
-    }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public Map<String, String> getFieldMappings() {
-        return fieldMappings;
-    }
-
-    public String getCharEncoding() {
-        return charEncoding;
-    }
-
-    public String getTokenizeAttribute() {
-        return tokenizeAttribute;
-    }
-
-    public Map<String, String> getTokenizeSubstitutionMap() {
-        return tokenizeSubstitutionMap;
-    }
-
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    protected String charEncoding;
+    protected String tokenizeAttribute;
+    protected Map<String, String> tokenizeSubstitutionMap;
+    protected DocumentProcessor documentProcessor;
 
     @Required
     public void setSearchService(SearchService searchService) {
@@ -124,10 +98,36 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         this.tokenizeSubstitutionMap = tokenizeSubstitutionMap;
     }
 
+    public void setDocumentProcessor(DocumentProcessor documentProcessor) {
+        this.documentProcessor = documentProcessor;
+    }
+
     @Override
-    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
-        String root = siteConfiguration.getLocalRepositoryRoot();
-        String siteId = (!StringUtils.isEmpty(siteName))? siteName: siteConfiguration.getSiteId();
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    @PostConstruct
+    public void init() {
+        if (documentProcessor == null) {
+            List<DocumentProcessor> chain = createDocumentProcessorChain(new ArrayList<DocumentProcessor>());
+
+            documentProcessor = new DocumentProcessorChain(chain);
+        }
+    }
+
+    @Override
+    public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
+                          PublishingTarget target) throws PublishingException {
+        String root = target.getParameter(FileUploadServlet.CONFIG_ROOT);
+        String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
+        String siteId = (!StringUtils.isEmpty(siteName))? siteName: parameters.get(FileUploadServlet.PARAM_SITE);
+
+        root += "/" + contentFolder;
 
         if (StringUtils.isNotBlank(siteId)) {
             root = root.replaceAll(FileUploadServlet.CONFIG_MULTI_TENANCY_VARIABLE, siteId);
@@ -155,7 +155,28 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         return SearchUpdateProcessor.class.getSimpleName();
     }
 
-    private void update(String siteId, String root, List<String> fileNames, boolean delete) throws PublishingException {
+    protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
+        FieldRenamingDocumentProcessor frp = new FieldRenamingDocumentProcessor();
+        if (MapUtils.isNotEmpty(fieldMappings)) {
+            frp.setFieldMappings(fieldMappings);
+        }
+
+        TokenizeAttributeParsingDocumentProcessor tapp = new TokenizeAttributeParsingDocumentProcessor();
+        if (StringUtils.isNotEmpty(tokenizeAttribute)) {
+            tapp.setTokenizeAttribute(tokenizeAttribute);
+        }
+        if (MapUtils.isNotEmpty(tokenizeSubstitutionMap)) {
+            tapp.setTokenizeSubstitutionMap(tokenizeSubstitutionMap);
+        }
+
+        chain.add(frp);
+        chain.add(tapp);
+
+        return chain;
+    }
+
+    protected void update(String siteId, String root, List<String> fileNames,
+                          boolean delete) throws PublishingException {
         for (String fileName : fileNames) {
             if (fileName.endsWith(".xml")) {
                 try {
@@ -189,7 +210,7 @@ public class SearchUpdateProcessor implements PublishingProcessor {
     protected String processXml(String root, String fileName) throws DocumentException {
         File file = new File(root + fileName);
 
-        Document document = processDocument(root, file, XmlUtils.readXml(file, charEncoding));
+        Document document = processDocument(XmlUtils.readXml(file, charEncoding), file, root);
         String xml = document.asXML();
 
         if (logger.isDebugEnabled()) {
@@ -200,19 +221,8 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         return xml;
     }
 
-    protected Document processDocument(String root, File file, Document document) throws DocumentException {
-        document = renameFields(document);
-        document = processTokenizeAttributes(document);
-
-        return document;
-    }
-
-    protected Document renameFields(Document document) {
-        return SearchUtils.renameFields(document, fieldMappings);
-    }
-
-    protected Document processTokenizeAttributes(Document document) {
-        return SearchUtils.processTokenizeAttributes(document, tokenizeAttribute, tokenizeSubstitutionMap);
+    protected Document processDocument(Document document, File file, String root) throws DocumentException {
+        return documentProcessor.process(document, file, root);
     }
 
 }
