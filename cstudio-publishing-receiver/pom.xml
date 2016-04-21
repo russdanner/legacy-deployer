@@ -50,9 +50,7 @@
         <profile>
             <id>uberjar</id>
             <activation>
-                <property>
-                    <name>uberjar</name>
-                </property>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <build>
                 <plugins>
