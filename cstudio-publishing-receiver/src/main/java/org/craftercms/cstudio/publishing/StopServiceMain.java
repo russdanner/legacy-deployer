@@ -73,6 +73,7 @@ public class StopServiceMain {
         		LOGGER.error(PROPERTIES_NAME + " is not present in shutdown-context.xml");
         	}
     	}
+        context.close();
     }
 
     /**
