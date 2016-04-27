@@ -11,8 +11,6 @@ import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.errors.AmbiguousObjectException;
-import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -23,13 +21,9 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class GitBasedDeployer {
 
-    private final static Logger logger = LoggerFactory.getLogger(GitBasedDeployer.class);
+    private static final Logger logger = LoggerFactory.getLogger(GitBasedDeployer.class);
 
     protected static final ReentrantLock singleWorkerLock = new ReentrantLock();
 
@@ -140,60 +134,50 @@ public class GitBasedDeployer {
         return call;
     }
 
-    private PublishedChangeSet processPull(Repository repository, ObjectId oldHead, ObjectId newHead) {
+    private PublishedChangeSet processPull(Repository repository, ObjectId oldHead, ObjectId newHead) throws IOException, GitAPIException {
         PublishedChangeSet changeSet = new PublishedChangeSet(new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>());
 
-        try  {
-            RevWalk revWalk = new RevWalk(repository);
-            RevCommit revCommit = revWalk.parseCommit(oldHead);
-            ObjectId oldHeadTree = revCommit.getTree().getId();
-            revCommit = revWalk.parseCommit(newHead);
-            ObjectId newHeadTree = revCommit.getTree().getId();
+        RevWalk revWalk = new RevWalk(repository);
+        RevCommit revCommit = revWalk.parseCommit(oldHead);
+        ObjectId oldHeadTree = revCommit.getTree().getId();
+        revCommit = revWalk.parseCommit(newHead);
+        ObjectId newHeadTree = revCommit.getTree().getId();
 
-            // prepare the two iterators to compute the diff between
-            try (ObjectReader reader = repository.newObjectReader()) {
-                CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
-                oldTreeIter.reset(reader, oldHeadTree);
-                CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
-                newTreeIter.reset(reader, newHeadTree);
+        // prepare the two iterators to compute the diff between
+        try (ObjectReader reader = repository.newObjectReader()) {
+            CanonicalTreeParser oldTreeIter = new CanonicalTreeParser();
+            oldTreeIter.reset(reader, oldHeadTree);
+            CanonicalTreeParser newTreeIter = new CanonicalTreeParser();
+            newTreeIter.reset(reader, newHeadTree);
 
-                // finally get the list of changed files
-                try (Git git = new Git(repository)) {
-                    List<DiffEntry> diffs= git.diff()
-                            .setNewTree(newTreeIter)
-                            .setOldTree(oldTreeIter)
-                            .call();
-                    for (DiffEntry entry : diffs) {
-                        logger.debug("Git Diff Entry: " + entry);
-                        switch (entry.getChangeType()) {
-                            case ADD:
-                                changeSet.getCreatedFiles().add(File.separator + entry.getNewPath());
-                                break;
+            // finally get the list of changed files
+            try (Git git = new Git(repository)) {
+                List<DiffEntry> diffs= git.diff()
+                        .setNewTree(newTreeIter)
+                        .setOldTree(oldTreeIter)
+                        .call();
+                for (DiffEntry entry : diffs) {
+                    logger.debug("Git Diff Entry: " + entry);
+                    switch (entry.getChangeType()) {
+                        case ADD:
+                            changeSet.getCreatedFiles().add(File.separator + entry.getNewPath());
+                            break;
 
-                            case MODIFY:
-                                changeSet.getUpdatedFiles().add(File.separator + entry.getNewPath());
-                                break;
+                        case MODIFY:
+                            changeSet.getUpdatedFiles().add(File.separator + entry.getNewPath());
+                            break;
 
-                            case DELETE:
-                                changeSet.getDeletedFiles().add(File.separator + entry.getOldPath());
-                                break;
+                        case DELETE:
+                            changeSet.getDeletedFiles().add(File.separator + entry.getOldPath());
+                            break;
 
-                            case RENAME:
-                                changeSet.getDeletedFiles().add(File.separator + entry.getOldPath());
-                                changeSet.getCreatedFiles().add(File.separator + entry.getNewPath());
-                                break;
-                        }
+                        case RENAME:
+                            changeSet.getDeletedFiles().add(File.separator + entry.getOldPath());
+                            changeSet.getCreatedFiles().add(File.separator + entry.getNewPath());
+                            break;
                     }
                 }
             }
-        } catch (IncorrectObjectTypeException e) {
-            e.printStackTrace();
-        } catch (AmbiguousObjectException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
         }
         return changeSet;
     }
