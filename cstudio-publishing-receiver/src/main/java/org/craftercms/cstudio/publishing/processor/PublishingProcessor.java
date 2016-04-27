@@ -28,6 +28,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  * @author hyanghee
  *
  */
+@Deprecated
 public interface PublishingProcessor {
 
     /**

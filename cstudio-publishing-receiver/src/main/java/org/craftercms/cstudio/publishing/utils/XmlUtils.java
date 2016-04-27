@@ -18,19 +18,35 @@ package org.craftercms.cstudio.publishing.utils;
 
 import java.io.File;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 
+/**
+ * Utility methods for XML.
+ *
+ * @author avasquez
+ */
 public class XmlUtils {
 
     private XmlUtils() {
     }
 
+    /**
+     * Reads an XML to generate a DOM.
+     *
+     * @param file      the file to read
+     * @param encoding  the encoding of the file
+     *
+     * @return the DOM
+     */
     public static Document readXml(File file, String encoding) throws DocumentException {
         SAXReader reader = new SAXReader();
-        reader.setEncoding(encoding);
         reader.setMergeAdjacentText(true);
+        if (StringUtils.isNotEmpty(encoding)) {
+            reader.setEncoding(encoding);
+        }
 
         return reader.read(file);
     }

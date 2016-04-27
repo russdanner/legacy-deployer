@@ -6,10 +6,21 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 
 /**
- * Created by alfonsovasquez on 4/3/16.
+ * Processes an XML DOM to modify or enhance it.
+ *
+ * @author avasquez
  */
 public interface DocumentProcessor {
 
+    /**
+     * Processes the specified XML DOM.
+     *
+     * @param document      the DOM
+     * @param file          the XML file
+     * @param rootFolder    the root folder where this file is located
+     *
+     * @return the processed DOM
+     */
     Document process(Document document, File file, String rootFolder) throws DocumentException;
 
 }

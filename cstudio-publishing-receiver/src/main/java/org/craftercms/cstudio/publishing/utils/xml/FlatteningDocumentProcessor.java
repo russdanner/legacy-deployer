@@ -16,7 +16,10 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 
 /**
- * Created by alfonsovasquez on 4/3/16.
+ * {@link DocumentProcessor} that parses the document for {@code &gt;include&lt} elements and replaces them for the
+ * actual referenced XML components.
+ *
+ * @author avasquez
  */
 public class FlatteningDocumentProcessor implements DocumentProcessor {
 
@@ -57,6 +60,10 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
 
     protected Document flattenXml(Document document, File file, String rootFolder,
                                   List<File> flattenedFiles) throws DocumentException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Flattening XML file " + file + "...");
+        }
+
         flattenedFiles.add(file);
 
         List<Element> includeElements = document.selectNodes(includeElementXPathQuery);
@@ -84,13 +91,12 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
                 File includeFile = new File(includeSrcPath);
                 if (includeFile.exists()) {
                     if (!flattenedFiles.contains(includeFile)) {
-                        Document includeDocument = flattenXml(XmlUtils.readXml(includeFile, charEncoding),
-                                                              includeFile, rootFolder, flattenedFiles);
-
                         if (logger.isDebugEnabled()) {
-                            logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
+                            logger.debug("Include found in " + file + ": " + includeSrcPath);
                         }
 
+                        Document includeDocument = flattenXml(XmlUtils.readXml(includeFile, charEncoding),
+                                                              includeFile, rootFolder, flattenedFiles);
                         doInclude(includeElement, includeDocument);
                     } else {
                         logger.warn("Circular inclusion detected. File " + includeFile + " already included");

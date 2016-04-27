@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
 import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessor;
 
+@Deprecated
 public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
     protected String includeElementXPathQuery;

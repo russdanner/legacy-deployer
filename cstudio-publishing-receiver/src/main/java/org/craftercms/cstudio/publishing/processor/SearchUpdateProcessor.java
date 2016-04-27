@@ -46,6 +46,7 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author Alfonso Vásquez
  */
+@Deprecated
 public class SearchUpdateProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchUpdateProcessor.class);

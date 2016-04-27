@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 /**
  * <p>A post processor that sends email with the content published</p>
  */
+@Deprecated
 public class EmailProcessor implements PublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(EmailProcessor.class);

@@ -34,6 +34,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  *
  * @author Dejan Brkic
  */
+@Deprecated
 public class CacheInvalidatePostProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(CacheInvalidatePostProcessor.class);

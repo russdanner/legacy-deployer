@@ -30,6 +30,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  * @author hyanghee
  *
  */
+@Deprecated
 public class SamplePostProcessor implements PublishingProcessor {
 
 	private static Log LOGGER = LogFactory.getLog(SamplePostProcessor.class);

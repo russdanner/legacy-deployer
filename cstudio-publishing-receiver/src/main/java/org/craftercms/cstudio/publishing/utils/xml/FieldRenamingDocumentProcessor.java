@@ -12,7 +12,10 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 
 /**
- * Created by alfonsovasquez on 4/3/16.
+ * {@link DocumentProcessor} that renames elements or fields based on mappings, where a mapping is of the form:
+ * XPath of fields to rename -> new field name.
+ *
+ * @author avasquez
  */
 public class FieldRenamingDocumentProcessor implements DocumentProcessor {
 
@@ -32,7 +35,8 @@ public class FieldRenamingDocumentProcessor implements DocumentProcessor {
                 String newName = entry.getValue();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Renaming elements that match XPath " + xpath + " to '" + newName + "'");
+                    logger.debug("Renaming elements that match XPath " + xpath + " to '" + newName + "' for file " +
+                                 file + "...");
                 }
 
                 List<Element> elements = document.selectNodes(xpath);
@@ -42,7 +46,15 @@ public class FieldRenamingDocumentProcessor implements DocumentProcessor {
                     }
 
                     for (Element element : elements) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Renaming element " + element.getUniquePath());
+                        }
+
                         element.setName(newName);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Element renamed to " + element.getUniquePath());
+                        }
                     }
                 }
             }

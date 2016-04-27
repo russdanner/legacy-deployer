@@ -1,5 +1,10 @@
 package org.craftercms.cstudio.publishing.processor;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -10,11 +15,7 @@ import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.search.service.SearchService;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
+@Deprecated
 public class SearchIndexBinaryFilesProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchAttachmentProcessor.class);

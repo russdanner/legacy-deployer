@@ -1,12 +1,5 @@
 package org.craftercms.cstudio.publishing.processor;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.craftercms.cstudio.publishing.PublishedChangeSet;
-import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,9 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.craftercms.cstudio.publishing.PublishedChangeSet;
+import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
+import org.craftercms.cstudio.publishing.target.PublishingTarget;
+
 /**
  * <p>Windows Command Processor</p>
  */
+@Deprecated
 public class CommandProcessor implements PublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(CommandProcessor.class);

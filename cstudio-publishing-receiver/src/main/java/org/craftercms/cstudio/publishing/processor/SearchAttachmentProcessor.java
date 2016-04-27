@@ -33,6 +33,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Required;
 
+@Deprecated
 public class SearchAttachmentProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchAttachmentProcessor.class);

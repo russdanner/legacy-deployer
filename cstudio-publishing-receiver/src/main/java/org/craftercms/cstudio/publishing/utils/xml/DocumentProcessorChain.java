@@ -1,6 +1,7 @@
 package org.craftercms.cstudio.publishing.utils.xml;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -8,7 +9,9 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 
 /**
- * Created by alfonsovasquez on 4/3/16.
+ * Represents a chain of {@link DocumentProcessor}.
+ *
+ * @author avasquez
  */
 public class DocumentProcessorChain implements DocumentProcessor {
 
@@ -23,6 +26,14 @@ public class DocumentProcessorChain implements DocumentProcessor {
 
     public void setProcessors(List<DocumentProcessor> processors) {
         this.processors = processors;
+    }
+
+    public void addProcessor(DocumentProcessor processor) {
+        if (processors == null) {
+            processors = new ArrayList<>();
+        }
+
+        processors.add(processor);
     }
 
     @Override

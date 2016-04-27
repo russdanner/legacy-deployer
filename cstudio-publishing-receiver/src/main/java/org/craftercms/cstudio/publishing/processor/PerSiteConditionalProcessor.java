@@ -16,6 +16,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  *
  * @author avasquez
  */
+@Deprecated
 public class PerSiteConditionalProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(PerSiteConditionalProcessor.class);

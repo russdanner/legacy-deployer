@@ -14,7 +14,11 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 
 /**
- * Created by alfonsovasquez on 4/3/16.
+ * {@link DocumentProcessor} that parses elements that have a "tokenize" attribute. For every element with "tokenize",
+ * a copy is created but with a slightly different suffix so that Solr understands that it has to be analyzed and
+ * tokenized.
+ *
+ * @author avasquez
  */
 public class TokenizeAttributeParsingDocumentProcessor implements DocumentProcessor {
 
@@ -46,7 +50,7 @@ public class TokenizeAttributeParsingDocumentProcessor implements DocumentProces
         if (MapUtils.isNotEmpty(tokenizeSubstitutionMap)) {
             String tokenizeXpath = String.format("//*[@%s=\"true\"]", tokenizeAttribute);
             if (logger.isDebugEnabled()) {
-                logger.debug("Using tokenize XPath: " + tokenizeXpath);
+                logger.debug("Performing tokenize parsing with XPath " + tokenizeXpath + " for file " + file + "...");
             }
 
             List<Element> tokenizeElements = document.selectNodes(tokenizeXpath);
@@ -63,19 +67,20 @@ public class TokenizeAttributeParsingDocumentProcessor implements DocumentProces
                 String elemName = tokenizeElement.getName();
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Parsing element: " + elemName);
+                    logger.debug("Parsing element " + tokenizeElement.getUniquePath());
                 }
 
                 for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
                     if (elemName.endsWith(substitutionKey)) {
                         String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) +
                                                 tokenizeSubstitutionMap.get(substitutionKey);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Adding new element for tokenized search: " + newElementName);
-                        }
 
                         Element newElement = tokenizeElement.createCopy(newElementName);
                         parent.add(newElement);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Added new element for tokenized search: " + newElement.getUniquePath());
+                        }
                     }
                 }
             }
