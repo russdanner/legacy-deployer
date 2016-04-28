@@ -1,13 +1,13 @@
 package org.craftercms.deployer.git.processor;
 
+import java.util.Map;
+
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.deployer.git.config.SiteConfiguration;
-
-import java.util.Map;
 
 /**
  * {@link PublishingProcessor} decorator that executes a different processor per site, or if there's no processor
@@ -28,7 +28,8 @@ public class PerSiteConditionalProcessor implements PublishingProcessor {
     public void setOrder(int order) { this.order = order; }
 
     public Map<String, PublishingProcessor> getProcessorMappings() { return processorMappings; }
-    public void setProcessorMappings(Map<String, PublishingProcessor> processorMappings) { this.processorMappings = processorMappings;
+    public void setProcessorMappings(Map<String, PublishingProcessor> processorMappings) {
+        this.processorMappings = processorMappings;
     }
 
     public PublishingProcessor getDefaultProcessor() { return defaultProcessor; }
