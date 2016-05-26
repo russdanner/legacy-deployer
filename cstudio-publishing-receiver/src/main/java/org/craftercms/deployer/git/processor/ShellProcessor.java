@@ -46,7 +46,8 @@ public class ShellProcessor implements PublishingProcessor {
     protected int order = Integer.MAX_VALUE;
 
     @Override
-    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration,
+                          PublishedChangeSet changeSet) throws PublishingException {
         checkConfiguration(siteConfiguration);
         LOGGER.debug("Starting Shell Processor");
         ProcessBuilder builder = new ProcessBuilder();
@@ -135,7 +136,7 @@ public class ShellProcessor implements PublishingProcessor {
             result = mergeList(changeSet.getDeletedFiles());
         } else {
             LOGGER.debug("Parameter " + sourceFiles + " has a non valid value, valid values (UPDATED,NEW,EXISTENT," +
-                "DELETE)");
+                         "DELETE)");
             LOGGER.debug("Due non valid " + sourceFiles + " value returning empty list");
         }
         for (int i = 0; i < result.size(); i++) {
@@ -151,8 +152,7 @@ public class ShellProcessor implements PublishingProcessor {
      * @param target     Target in which the processor is running
      * @throws PublishingException If some of the given configuration is wrong
      */
-    private void checkConfiguration(SiteConfiguration siteConfiguration) throws
-        PublishingException {
+    private void checkConfiguration(SiteConfiguration siteConfiguration) throws PublishingException {
         if (workingDir == null) {
             // Set a default one
             workingDir = buildContentPath(siteConfiguration);
@@ -192,8 +192,9 @@ public class ShellProcessor implements PublishingProcessor {
         if (new File(siteConfiguration.getLocalRepositoryRoot()).exists()) {
             path = siteConfiguration.getLocalRepositoryRoot();
         } else {
-            path = directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File
-                .separator + siteConfiguration.getLocalRepositoryRoot();
+            path =
+                directory.getAbsolutePath().subSequence(0, directory.getAbsolutePath().length() - 2) + File.separator +
+                siteConfiguration.getLocalRepositoryRoot();
         }
         LOGGER.debug("Build path is " + path);
         return path;
@@ -226,32 +227,50 @@ public class ShellProcessor implements PublishingProcessor {
         return "Shell Processor";
     }
 
-    public String getWorkingDir() { return workingDir; }
+    public String getWorkingDir() {
+        return workingDir;
+    }
+
     public void setWorkingDir(String workingDir) {
         this.workingDir = workingDir;
     }
 
-    public String getCommand() { return command; }
+    public String getCommand() {
+        return command;
+    }
+
     public void setCommand(String command) {
         this.command = command;
     }
 
-    public Map<String, String> getArguments() { return arguments; }
+    public Map<String, String> getArguments() {
+        return arguments;
+    }
+
     public void setArguments(Map<String, String> arguments) {
         this.arguments = arguments;
     }
 
-    public Map<String, String> getEnviroment() { return enviroment; }
+    public Map<String, String> getEnviroment() {
+        return enviroment;
+    }
+
     public void setEnviroment(Map<String, String> enviroment) {
         this.enviroment = enviroment;
     }
 
-    public String getSourceFiles() { return sourceFiles; }
+    public String getSourceFiles() {
+        return sourceFiles;
+    }
+
     public void setSourceFiles(String sourceFiles) {
         this.sourceFiles = sourceFiles;
     }
 
-    public boolean isAsSingleCommand() { return asSingleCommand; }
+    public boolean isAsSingleCommand() {
+        return asSingleCommand;
+    }
+
     public void setAsSingleCommand(boolean asSingleCommand) {
         this.asSingleCommand = asSingleCommand;
     }
@@ -270,6 +289,12 @@ public class ShellProcessor implements PublishingProcessor {
     }
 
     @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
 }

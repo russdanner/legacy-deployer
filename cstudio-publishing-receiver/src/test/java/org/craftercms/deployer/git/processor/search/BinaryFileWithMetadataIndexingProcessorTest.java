@@ -1,4 +1,4 @@
-package org.crafetrcms.deployer.git.processor;
+package org.craftercms.deployer.git.processor.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import java.util.Map;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.deployer.git.processor.PublishingProcessor;
-import org.craftercms.deployer.git.processor.search.BinaryFileWithMetadataIndexingProcessor;
 import org.craftercms.search.service.SearchService;
 import org.junit.Before;
 import org.junit.Test;
@@ -72,7 +71,6 @@ public class BinaryFileWithMetadataIndexingProcessorTest {
         processor.setExcludeMetadataProperties(Arrays.asList("objectId"));
         processor.setReferenceXPaths(Arrays.asList("//attachment"));
         processor.setSearchService(searchService);
-        processor.init();
 
         return processor;
     }

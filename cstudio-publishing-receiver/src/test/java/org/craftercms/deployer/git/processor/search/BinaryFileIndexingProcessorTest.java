@@ -1,4 +1,4 @@
-package org.crafetrcms.deployer.git.processor;
+package org.craftercms.deployer.git.processor.search;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +7,6 @@ import java.util.Arrays;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.deployer.git.processor.PublishingProcessor;
-import org.craftercms.deployer.git.processor.search.BinaryFileIndexingProcessor;
 import org.craftercms.search.service.SearchService;
 import org.junit.Before;
 import org.junit.Test;

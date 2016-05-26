@@ -24,21 +24,33 @@ public class PerSiteConditionalProcessor implements PublishingProcessor {
     protected int order = Integer.MAX_VALUE;
 
     @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public int getOrder() {
+        return order;
+    }
 
-    public Map<String, PublishingProcessor> getProcessorMappings() { return processorMappings; }
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public Map<String, PublishingProcessor> getProcessorMappings() {
+        return processorMappings;
+    }
+
     public void setProcessorMappings(Map<String, PublishingProcessor> processorMappings) {
         this.processorMappings = processorMappings;
     }
 
-    public PublishingProcessor getDefaultProcessor() { return defaultProcessor; }
+    public PublishingProcessor getDefaultProcessor() {
+        return defaultProcessor;
+    }
+
     public void setDefaultProcessor(PublishingProcessor defaultProcessor) {
         this.defaultProcessor = defaultProcessor;
     }
 
     @Override
-    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration,
+                          PublishedChangeSet changeSet) throws PublishingException {
         String siteId = siteConfiguration.getSiteId();
         PublishingProcessor processor = null;
 

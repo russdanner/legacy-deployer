@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -31,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.craftercms.commons.lang.RegexUtils;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChainFactoryBean;
+import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChain;
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -62,6 +61,7 @@ public class BinaryFileWithMetadataIndexingProcessor extends AbstractIndexingPro
 
     public BinaryFileWithMetadataIndexingProcessor() {
         charEncoding = "UTF-8";
+        documentProcessor = new DefaultDocumentProcessorChain();
     }
 
     public void setDocumentProcessor(DocumentProcessor documentProcessor) {
@@ -82,16 +82,6 @@ public class BinaryFileWithMetadataIndexingProcessor extends AbstractIndexingPro
 
     public void setExcludeMetadataProperties(List<String> excludeMetadataProperties) {
         this.excludeMetadataProperties = excludeMetadataProperties;
-    }
-
-    @PostConstruct
-    public void init() throws Exception {
-        if (documentProcessor == null) {
-            DefaultDocumentProcessorChainFactoryBean factoryBean = new DefaultDocumentProcessorChainFactoryBean();
-            factoryBean.afterPropertiesSet();
-
-            documentProcessor = factoryBean.getObject();
-        }
     }
 
     @Override

@@ -20,13 +20,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-import javax.annotation.PostConstruct;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChainFactoryBean;
+import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChain;
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -48,6 +47,7 @@ public class XmlFileIndexingProcessor extends AbstractIndexingProcessor {
 
     public XmlFileIndexingProcessor() {
         charEncoding = "UTF-8";
+        documentProcessor = new DefaultDocumentProcessorChain();
     }
 
     public void setDocumentProcessor(DocumentProcessor documentProcessor) {
@@ -56,16 +56,6 @@ public class XmlFileIndexingProcessor extends AbstractIndexingProcessor {
 
     public void setCharEncoding(String charEncoding) {
         this.charEncoding = charEncoding;
-    }
-
-    @PostConstruct
-    public void init() throws Exception {
-        if (documentProcessor == null) {
-            DefaultDocumentProcessorChainFactoryBean factoryBean = new DefaultDocumentProcessorChainFactoryBean();
-            factoryBean.afterPropertiesSet();
-
-            documentProcessor = factoryBean.getObject();
-        }
     }
 
     @Override

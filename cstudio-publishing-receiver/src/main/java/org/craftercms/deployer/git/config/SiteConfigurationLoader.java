@@ -1,9 +1,5 @@
 package org.craftercms.deployer.git.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.Yaml;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -12,6 +8,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.yaml.snakeyaml.Yaml;
 
 public class SiteConfigurationLoader {
 
@@ -26,7 +26,7 @@ public class SiteConfigurationLoader {
         logger.debug("Config location " + dir.toAbsolutePath().toString());
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir.toAbsolutePath())) {
 
-            for (Path entry: stream) {
+            for (Path entry : stream) {
                 logger.debug("processing file " + entry.normalize().toString());
                 Path filename = entry.getFileName();
                 String strFilename = filename.toString();
@@ -60,8 +60,13 @@ public class SiteConfigurationLoader {
         return siteConfiguration;
     }
 
-    public String getConfigurationLocation() { return configurationLocation; }
-    public void setConfigurationLocation(String configurationLocation) { this.configurationLocation = configurationLocation; }
+    public String getConfigurationLocation() {
+        return configurationLocation;
+    }
+
+    public void setConfigurationLocation(String configurationLocation) {
+        this.configurationLocation = configurationLocation;
+    }
 
     private String configurationLocation;
 }

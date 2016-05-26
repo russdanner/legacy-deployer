@@ -16,9 +16,7 @@
  */
 package org.craftercms.deployer.git.processor.search;
 
-import javax.annotation.PostConstruct;
-
-import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessorChainFactoryBean;
+import org.craftercms.cstudio.publishing.utils.xml.DefaultFlatteningDocumentProcessorChain;
 
 /**
  * {@link org.craftercms.deployer.git.processor.PublishingProcessor} that updates/deletes XML files from a
@@ -28,15 +26,8 @@ import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessorCh
  */
 public class FlattenedXmlFileIndexingProcessor extends XmlFileIndexingProcessor {
 
-    @Override
-    @PostConstruct
-    public void init() throws Exception {
-        if (documentProcessor == null) {
-            FlatteningDocumentProcessorChainFactoryBean factoryBean = new FlatteningDocumentProcessorChainFactoryBean();
-            factoryBean.afterPropertiesSet();
-
-            documentProcessor = factoryBean.getObject();
-        }
+    public FlattenedXmlFileIndexingProcessor() {
+        documentProcessor = new DefaultFlatteningDocumentProcessorChain();
     }
 
 }

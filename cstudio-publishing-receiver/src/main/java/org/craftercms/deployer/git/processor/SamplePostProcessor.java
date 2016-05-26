@@ -20,61 +20,65 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
-import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 
-import java.util.Map;
-
 /**
- * a sample post processor that logs a list of files published 
- * 
- * @author hyanghee
+ * a sample post processor that logs a list of files published
  *
+ * @author hyanghee
  */
 public class SamplePostProcessor implements PublishingProcessor {
 
-	private static Log LOGGER = LogFactory.getLog(SamplePostProcessor.class);
+    private static Log LOGGER = LogFactory.getLog(SamplePostProcessor.class);
+
     /*
          * (non-Javadoc)
-         * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#doProcess(org.craftercms.cstudio.publishing.PublishedChangeSet, java.util.Map, org.craftercms.cstudio.publishing.target.PublishingTarget)
+         * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#doProcess(org.craftercms.cstudio
+         * .publishing.PublishedChangeSet, java.util.Map, org.craftercms.cstudio.publishing.target.PublishingTarget)
          */
-	@Override
-    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
-		if (LOGGER.isInfoEnabled()) {
-			if (changeSet != null) {
-				LOGGER.info("Printing the list of files deployed.");
-				if (changeSet.getCreatedFiles() != null) {
-					for (String file : changeSet.getCreatedFiles()) {
-						LOGGER.info("[CREATED] " + file);
-					}
-				}
-				if (changeSet.getUpdatedFiles() != null) {
-					for (String file : changeSet.getUpdatedFiles()) {
-						LOGGER.info("[UPATED] " + file);
-					}
-				}
-				if (changeSet.getDeletedFiles() != null) {
-					for (String file : changeSet.getDeletedFiles()) {
-						LOGGER.info("[DELETED] " + file);
-					}
-				}
-				LOGGER.info("end of the list of files deployed.");
-			}
-		}
-	}
+    @Override
+    public void doProcess(SiteConfiguration siteConfiguration,
+                          PublishedChangeSet changeSet) throws PublishingException {
+        if (LOGGER.isInfoEnabled()) {
+            if (changeSet != null) {
+                LOGGER.info("Printing the list of files deployed.");
+                if (changeSet.getCreatedFiles() != null) {
+                    for (String file : changeSet.getCreatedFiles()) {
+                        LOGGER.info("[CREATED] " + file);
+                    }
+                }
+                if (changeSet.getUpdatedFiles() != null) {
+                    for (String file : changeSet.getUpdatedFiles()) {
+                        LOGGER.info("[UPATED] " + file);
+                    }
+                }
+                if (changeSet.getDeletedFiles() != null) {
+                    for (String file : changeSet.getDeletedFiles()) {
+                        LOGGER.info("[DELETED] " + file);
+                    }
+                }
+                LOGGER.info("end of the list of files deployed.");
+            }
+        }
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#getName()
-	 */
-	@Override
-	public String getName() {
-		return "SamplePostProcessor";
-	}
+    /*
+     * (non-Javadoc)
+     * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#getName()
+     */
+    @Override
+    public String getName() {
+        return "SamplePostProcessor";
+    }
 
     protected int order = Integer.MAX_VALUE;
 
     @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
 }

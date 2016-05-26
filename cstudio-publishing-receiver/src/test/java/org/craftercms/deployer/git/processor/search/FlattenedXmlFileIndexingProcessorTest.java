@@ -1,11 +1,10 @@
-package org.crafetrcms.deployer.git.processor;
+package org.craftercms.deployer.git.processor.search;
 
 import java.util.Collections;
 
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessorChainFactoryBean;
+import org.craftercms.cstudio.publishing.utils.xml.DefaultFlatteningDocumentProcessorChain;
 import org.craftercms.deployer.git.processor.PublishingProcessor;
-import org.craftercms.deployer.git.processor.search.FlattenedXmlFileIndexingProcessor;
 import org.craftercms.search.service.SearchService;
 
 /**
@@ -29,11 +28,10 @@ public class FlattenedXmlFileIndexingProcessorTest extends XmlFileIndexingProces
                                                "</page>";
 
     protected DocumentProcessor getDocumentProcessor() throws Exception {
-        FlatteningDocumentProcessorChainFactoryBean chainFactoryBean = new FlatteningDocumentProcessorChainFactoryBean();
-        chainFactoryBean.setFieldMappings(Collections.singletonMap("//name", "fileName"));
-        chainFactoryBean.afterPropertiesSet();
+        DefaultFlatteningDocumentProcessorChain processor = new DefaultFlatteningDocumentProcessorChain();
+        processor.setFieldMappings(Collections.singletonMap("//name", "fileName"));
 
-        return chainFactoryBean.getObject();
+        return processor;
     }
 
     @Override
@@ -41,7 +39,6 @@ public class FlattenedXmlFileIndexingProcessorTest extends XmlFileIndexingProces
         FlattenedXmlFileIndexingProcessor processor = new FlattenedXmlFileIndexingProcessor();
         processor.setDocumentProcessor(getDocumentProcessor());
         processor.setSearchService(searchService);
-        processor.init();
 
         return processor;
     }

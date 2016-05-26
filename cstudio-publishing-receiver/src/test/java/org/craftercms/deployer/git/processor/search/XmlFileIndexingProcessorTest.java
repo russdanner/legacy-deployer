@@ -1,15 +1,14 @@
-package org.crafetrcms.deployer.git.processor;
+package org.craftercms.deployer.git.processor.search;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
-import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChainFactoryBean;
+import org.craftercms.cstudio.publishing.utils.xml.DefaultDocumentProcessorChain;
 import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.craftercms.deployer.git.processor.PublishingProcessor;
-import org.craftercms.deployer.git.processor.search.XmlFileIndexingProcessor;
 import org.craftercms.search.service.SearchService;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,11 +60,10 @@ public class XmlFileIndexingProcessorTest {
     }
 
     protected DocumentProcessor getDocumentProcessor() throws Exception {
-        DefaultDocumentProcessorChainFactoryBean chainFactoryBean = new DefaultDocumentProcessorChainFactoryBean();
-        chainFactoryBean.setFieldMappings(Collections.singletonMap("//name", "fileName"));
-        chainFactoryBean.afterPropertiesSet();
+        DefaultDocumentProcessorChain processor = new DefaultDocumentProcessorChain();
+        processor.setFieldMappings(Collections.singletonMap("//name", "fileName"));
 
-        return chainFactoryBean.getObject();
+        return processor;
     }
 
     protected SearchService getSearchService() throws Exception {
@@ -76,7 +74,6 @@ public class XmlFileIndexingProcessorTest {
         XmlFileIndexingProcessor processor = new XmlFileIndexingProcessor();
         processor.setDocumentProcessor(getDocumentProcessor());
         processor.setSearchService(searchService);
-        processor.init();
 
         return processor;
     }
