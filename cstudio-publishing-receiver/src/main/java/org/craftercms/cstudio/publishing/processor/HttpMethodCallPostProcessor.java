@@ -29,7 +29,6 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-@Deprecated
 public class HttpMethodCallPostProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(HttpMethodCallPostProcessor.class);

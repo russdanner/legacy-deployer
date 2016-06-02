@@ -37,7 +37,6 @@ import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 
-@Deprecated
 public class ShellProcessor implements PublishingProcessor {
 
     private static final String INCLUDE_FILTER_PARAM = "includeFilter";

@@ -28,7 +28,6 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  * @author hyanghee
  *
  */
-@Deprecated
 public interface PublishingProcessor {
 
     /**
@@ -44,14 +43,15 @@ public interface PublishingProcessor {
 	 * @param target
 	 * @throws PublishingException
 	 */
-	public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException;
+	void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
+				   PublishingTarget target) throws PublishingException;
 	
 	/**
 	 * get the process's name
 	 * 
 	 * @return
 	 */
-	public String getName();
+	String getName();
 
     /**
      * get the order value for ordering in the list of processors.

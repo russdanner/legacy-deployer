@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-@Deprecated
 public class OnPathMatchConditionalProcessor implements PublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(OnPathMatchConditionalProcessor.class);

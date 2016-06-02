@@ -18,7 +18,6 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
 /**
  * <p>Windows Command Processor</p>
  */
-@Deprecated
 public class CommandProcessor implements PublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(CommandProcessor.class);
