@@ -177,6 +177,11 @@
         </dependency>
         <dependency>
             <groupId>org.craftercms</groupId>
+            <artifactId>crafter-search-batch-indexer</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.craftercms</groupId>
             <artifactId>crafter-search-client</artifactId>
             <version>${project.parent.version}</version>
         </dependency>

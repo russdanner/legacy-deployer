@@ -31,11 +31,11 @@ import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
-import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessorChain;
-import org.craftercms.cstudio.publishing.utils.xml.FieldRenamingDocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.TokenizeAttributeParsingDocumentProcessor;
+import org.craftercms.search.batch.utils.XmlUtils;
+import org.craftercms.search.batch.utils.xml.DocumentProcessor;
+import org.craftercms.search.batch.utils.xml.DocumentProcessorChain;
+import org.craftercms.search.batch.utils.xml.FieldRenamingDocumentProcessor;
+import org.craftercms.search.batch.utils.xml.TokenizeAttributeParsingDocumentProcessor;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -45,6 +45,7 @@ import org.springframework.beans.factory.annotation.Required;
  * Processor to update the Crafter Search engine index.
  *
  * @author Alfonso Vásquez
+ * @deprecated replaced by {@link SearchIndexingProcessor}
  */
 @Deprecated
 public class SearchUpdateProcessor implements PublishingProcessor {

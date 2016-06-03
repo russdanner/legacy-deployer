@@ -15,6 +15,9 @@ import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.search.service.SearchService;
 
+/**
+ * @deprecated replaced by {@link SearchIndexingProcessor}
+ */
 @Deprecated
 public class SearchIndexBinaryFilesProcessor implements PublishingProcessor {
 

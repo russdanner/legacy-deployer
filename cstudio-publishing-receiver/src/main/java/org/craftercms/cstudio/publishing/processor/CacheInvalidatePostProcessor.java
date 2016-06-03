@@ -33,6 +33,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  * Post processor that invalidates crafter cache
  *
  * @author Dejan Brkic
+ * @deprecated replaced by {@link HttpMethodCallPostProcessor}
  */
 @Deprecated
 public class CacheInvalidatePostProcessor implements PublishingProcessor {
