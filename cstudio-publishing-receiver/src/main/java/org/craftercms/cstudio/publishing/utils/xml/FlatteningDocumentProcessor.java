@@ -23,12 +23,15 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
     public static final String DEFAULT_CHAR_ENCODING = CharEncoding.UTF_8;
     public static final String DEFAULT_INCLUDE_ELEMENT_XPATH_QUERY = "//include";
     public static final String DEFAULT_DISABLE_FLATTENING_ELEMENT  = "disabledFlattening";
+    private static final String PAGE_CONTENT_NAME = "page";
 
     private static final Log logger = LogFactory.getLog(FlatteningDocumentProcessor.class);
+
 
     protected String charEncoding;
     protected String includeElementXPathQuery;
     protected String disableFlatteningElement;
+    protected boolean disableNestedPageFlattening;
 
     public FlatteningDocumentProcessor() {
         charEncoding = DEFAULT_CHAR_ENCODING;
@@ -91,7 +94,13 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
                             logger.debug("Include found in " + file.getAbsolutePath() + ": " + includeSrcPath);
                         }
 
-                        doInclude(includeElement, includeDocument);
+                        if(disableNestedPageFlattening){
+                            if(!isPage(includeDocument.getRootElement())) {
+                                doInclude(includeElement, includeDocument);
+                            }
+                        }else{
+                            doInclude(includeElement, includeDocument);
+                        }
                     } else {
                         logger.warn("Circular inclusion detected. File " + includeFile + " already included");
                     }
@@ -102,6 +111,11 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
         }
 
         return document;
+    }
+
+    private boolean isPage(final Node rootElement) {
+
+        return rootElement.getName().equalsIgnoreCase(PAGE_CONTENT_NAME);
     }
 
     protected void doInclude(Element includeElement, Document includeSrc) {
@@ -116,4 +130,7 @@ public class FlatteningDocumentProcessor implements DocumentProcessor {
         includeElementParentChildren.add(includeElementIdx, includeSrcRootElement);
     }
 
+    public void setDisableNestedPageFlattening(final boolean disableNestedPageFlattening) {
+        this.disableNestedPageFlattening = disableNestedPageFlattening;
+    }
 }

@@ -27,6 +27,7 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
     protected String includeElementXPathQuery;
     protected String disableFlatteningElement;
+    private boolean disableNestedPageFlattening;
 
     public String getIncludeElementXPathQuery() {
         return includeElementXPathQuery;
@@ -53,6 +54,7 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
         if (StringUtils.isNotEmpty(disableFlatteningElement)) {
             processor.setDisableFlatteningElement(disableFlatteningElement);
         }
+        processor.setDisableNestedPageFlattening(disableNestedPageFlattening);
 
         chain.add(processor);
 
@@ -64,4 +66,7 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
         return SearchUpdateFlattenXmlProcessor.class.getSimpleName();
     }
 
+    public void setDisableNestedPageFlattening(final boolean disableNestedPageFlattening) {
+        this.disableNestedPageFlattening = disableNestedPageFlattening;
+    }
 }
