@@ -79,8 +79,12 @@ public class ReprocessServiceServlet extends HttpServlet {
                     response.setStatus(status);
                     if (status == HttpServletResponse.SC_OK) {
                         responseWriter.println("Reprocess finished successfully");
+
+                        LOGGER.info("Reprocess finished successfully");
                     } else {
                         responseWriter.println("Reprocess failed");
+
+                        LOGGER.error("Reprocess failed");
                     }
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

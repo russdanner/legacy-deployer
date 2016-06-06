@@ -107,7 +107,7 @@ public class SearchIndexingProcessor implements PublishingProcessor {
         }
 
         if (updateCount > 0) {
-            searchService.commit();
+            searchService.commit(indexId);
         }
     }
 
