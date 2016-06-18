@@ -29,32 +29,36 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class HttpMethodCallPostProcessor implements PublishingProcessor {
+public class HttpMethodCallPostProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(HttpMethodCallPostProcessor.class);
 
     protected Method method;
     protected String url;
     protected String siteName;
-    protected int order = Integer.MAX_VALUE;
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public Method getMethod() {
+        return method;
+    }
 
-    public Method getMethod() { return method; }
     @Required
     public void setMethod(Method method) {
         this.method = method;
     }
 
-    public String getUrl() { return url; }
+    public String getUrl() {
+        return url;
+    }
+
     @Required
     public void setUrl(String url) {
         this.url = url;
     }
 
-    public String getSiteName() { return siteName; }
+    public String getSiteName() {
+        return siteName;
+    }
+
     public void setSiteName(String siteName) {
         this.siteName = siteName;
     }

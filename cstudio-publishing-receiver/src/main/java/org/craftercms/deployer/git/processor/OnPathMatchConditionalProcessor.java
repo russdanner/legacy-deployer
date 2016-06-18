@@ -22,21 +22,11 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class OnPathMatchConditionalProcessor implements PublishingProcessor {
+public class OnPathMatchConditionalProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(OnPathMatchConditionalProcessor.class);
 
     protected Map<String[], PublishingProcessor> processorMappings;
-    protected int order = Integer.MAX_VALUE;
-
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 
     public Map<String[], PublishingProcessor> getProcessorMappings() {
         return processorMappings;
@@ -98,11 +88,6 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
                 processor.doProcess(siteConfiguration, newChangeSet);
             }
         }
-    }
-
-    @Override
-    public String getName() {
-        return OnPathMatchConditionalProcessor.class.getSimpleName();
     }
 
     protected boolean matchesAnyPattern(String path, String[] patterns) {

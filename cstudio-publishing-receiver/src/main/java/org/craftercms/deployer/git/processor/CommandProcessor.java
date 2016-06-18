@@ -1,23 +1,22 @@
 package org.craftercms.deployer.git.processor;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 /**
  * <p>Windows Command Processor</p>
  */
-public class CommandProcessor implements PublishingProcessor {
+public class CommandProcessor extends AbstractPublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(CommandProcessor.class);
 
@@ -30,8 +29,6 @@ public class CommandProcessor implements PublishingProcessor {
 
     // file path patterns to match for execution
     private List<String> matchPatterns;
-
-    protected int order = Integer.MAX_VALUE;
 
     @Override
     public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) {
@@ -132,11 +129,6 @@ public class CommandProcessor implements PublishingProcessor {
         return true;
     }
 
-    @Override
-    public String getName() {
-        return "CommandProcessor";
-    }
-
     public String getCommand() { return command; }
     /**
      * <p>set command</p>
@@ -161,7 +153,4 @@ public class CommandProcessor implements PublishingProcessor {
      */
     public void setMatchPatterns(List<String> matchPatterns) { this.matchPatterns = matchPatterns; }
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 }

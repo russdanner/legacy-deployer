@@ -19,13 +19,12 @@ import org.craftercms.search.service.SearchService;
  * @deprecated replaced by {@link SearchIndexingProcessor}
  */
 @Deprecated
-public class SearchIndexBinaryFilesProcessor implements PublishingProcessor {
+public class SearchIndexBinaryFilesProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchAttachmentProcessor.class);
 
     private String siteName;
     private SearchService searchService;
-    protected int order = Integer.MAX_VALUE;
 
     /**
      * set a sitename to override in index
@@ -52,10 +51,6 @@ public class SearchIndexBinaryFilesProcessor implements PublishingProcessor {
     }
 
     public void setSearchService(SearchService searchService) { this.searchService = searchService; }
-
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 
     @Override
     public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters, PublishingTarget target) throws PublishingException {
@@ -99,8 +94,4 @@ public class SearchIndexBinaryFilesProcessor implements PublishingProcessor {
         }
     }
 
-    @Override
-    public String getName() {
-        return SearchIndexBinaryFilesProcessor.class.getSimpleName();
-    }
 }

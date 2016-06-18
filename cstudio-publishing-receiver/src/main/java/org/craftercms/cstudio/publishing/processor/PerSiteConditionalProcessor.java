@@ -16,23 +16,25 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  *
  * @author avasquez
  */
-public class PerSiteConditionalProcessor implements PublishingProcessor {
+public class PerSiteConditionalProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(PerSiteConditionalProcessor.class);
 
     protected Map<String, PublishingProcessor> processorMappings;
     protected PublishingProcessor defaultProcessor;
-    protected int order = Integer.MAX_VALUE;
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
-
-    public Map<String, PublishingProcessor> getProcessorMappings() { return processorMappings; }
-    public void setProcessorMappings(Map<String, PublishingProcessor> processorMappings) { this.processorMappings = processorMappings;
+    public Map<String, PublishingProcessor> getProcessorMappings() {
+        return processorMappings;
     }
 
-    public PublishingProcessor getDefaultProcessor() { return defaultProcessor; }
+    public void setProcessorMappings(Map<String, PublishingProcessor> processorMappings) {
+        this.processorMappings = processorMappings;
+    }
+
+    public PublishingProcessor getDefaultProcessor() {
+        return defaultProcessor;
+    }
+
     public void setDefaultProcessor(PublishingProcessor defaultProcessor) {
         this.defaultProcessor = defaultProcessor;
     }

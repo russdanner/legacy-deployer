@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class ShellProcessor implements PublishingProcessor {
+public class ShellProcessor extends AbstractPublishingProcessor {
 
     private static final String INCLUDE_FILTER_PARAM = "includeFilter";
     private static final String INCLUDE_FILES_ARG = "files";
@@ -43,7 +43,6 @@ public class ShellProcessor implements PublishingProcessor {
     private Map<String, String> enviroment;
     private String sourceFiles;
     private boolean asSingleCommand;
-    protected int order = Integer.MAX_VALUE;
 
     @Override
     public void doProcess(SiteConfiguration siteConfiguration,
@@ -222,11 +221,6 @@ public class ShellProcessor implements PublishingProcessor {
         return result;
     }
 
-    @Override
-    public String getName() {
-        return "Shell Processor";
-    }
-
     public String getWorkingDir() {
         return workingDir;
     }
@@ -286,15 +280,6 @@ public class ShellProcessor implements PublishingProcessor {
             }
         }
         return mergeTo;
-    }
-
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
     }
 
 }

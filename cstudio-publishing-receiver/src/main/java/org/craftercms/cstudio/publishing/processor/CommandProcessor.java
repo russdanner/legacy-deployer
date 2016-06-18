@@ -18,7 +18,7 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
 /**
  * <p>Windows Command Processor</p>
  */
-public class CommandProcessor implements PublishingProcessor {
+public class CommandProcessor extends AbstractPublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(CommandProcessor.class);
 
@@ -136,12 +136,10 @@ public class CommandProcessor implements PublishingProcessor {
         return true;
     }
 
-    @Override
-    public String getName() {
-        return "CommandProcessor";
+    public String getCommand() {
+        return command;
     }
 
-    public String getCommand() { return command; }
     /**
      * <p>set command</p>
      *
@@ -156,16 +154,17 @@ public class CommandProcessor implements PublishingProcessor {
      *
      * @return match patterns
      */
-    public List<String> getMatchPatterns() { return this.matchPatterns; }
+    public List<String> getMatchPatterns() {
+        return this.matchPatterns;
+    }
 
     /**
      * <p>set match patterns</p>
      *
      * @param matchPatterns
      */
-    public void setMatchPatterns(List<String> matchPatterns) { this.matchPatterns = matchPatterns; }
+    public void setMatchPatterns(List<String> matchPatterns) {
+        this.matchPatterns = matchPatterns;
+    }
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 }

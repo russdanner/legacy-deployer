@@ -7,10 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.craftercms.commons.lang.RegexUtils;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
@@ -22,18 +21,16 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class OnPathMatchConditionalProcessor implements PublishingProcessor {
+public class OnPathMatchConditionalProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(OnPathMatchConditionalProcessor.class);
 
     protected Map<String[], PublishingProcessor> processorMappings;
-    protected int order = Integer.MAX_VALUE;
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public Map<String[], PublishingProcessor> getProcessorMappings() {
+        return processorMappings;
+    }
 
-    public Map<String[], PublishingProcessor> getProcessorMappings() { return processorMappings; }
     @Required
     public void setProcessorMappings(Map<String[], PublishingProcessor> processorMappings) {
         this.processorMappings = processorMappings;
@@ -55,21 +52,21 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
 
             for (Iterator<String> iter = createdFiles.iterator(); iter.hasNext(); ) {
                 String path = iter.next();
-                if (matchesAnyPattern(path, patterns)) {
+                if (RegexUtils.matchesAny(path, patterns)) {
                     matchedCreatedFiles.add(path);
                     iter.remove();
                 }
             }
             for (Iterator<String> iter = updatedFiles.iterator(); iter.hasNext(); ) {
                 String path = iter.next();
-                if (matchesAnyPattern(path, patterns)) {
+                if (RegexUtils.matchesAny(path, patterns)) {
                     matchedUpdatedFiles.add(path);
                     iter.remove();
                 }
             }
             for (Iterator<String> iter = deletedFiles.iterator(); iter.hasNext(); ) {
                 String path = iter.next();
-                if (matchesAnyPattern(path, patterns)) {
+                if (RegexUtils.matchesAny(path, patterns)) {
                     matchedDeletedFiles.add(path);
                     iter.remove();
                 }
@@ -95,22 +92,6 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
     @Override
     public String getName() {
         return OnPathMatchConditionalProcessor.class.getSimpleName();
-    }
-
-    protected boolean matchesAnyPattern(String path, String[] patterns) {
-        if (StringUtils.isNotEmpty(path) && ArrayUtils.isNotEmpty(patterns)) {
-            for (String pattern : patterns) {
-                if (path.matches(pattern)) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(path + " matched " + pattern);
-                    }
-
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     protected List<String> copyFileList(List<String> files) {

@@ -48,11 +48,10 @@ import org.springframework.beans.factory.annotation.Required;
  * @deprecated replaced by {@link SearchIndexingProcessor}
  */
 @Deprecated
-public class SearchUpdateProcessor implements PublishingProcessor {
+public class SearchUpdateProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchUpdateProcessor.class);
 
-    protected int order;
     protected SearchService searchService;
     protected String siteName;
     protected Map<String, String> fieldMappings;
@@ -103,15 +102,6 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         this.documentProcessor = documentProcessor;
     }
 
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
     @PostConstruct
     public void init() {
         if (documentProcessor == null) {
@@ -149,11 +139,6 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         }
 
         searchService.commit();
-    }
-
-    @Override
-    public String getName() {
-        return SearchUpdateProcessor.class.getSimpleName();
     }
 
     protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {

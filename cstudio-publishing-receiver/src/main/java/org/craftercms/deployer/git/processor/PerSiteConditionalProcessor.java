@@ -15,22 +15,12 @@ import org.craftercms.deployer.git.config.SiteConfiguration;
  *
  * @author avasquez
  */
-public class PerSiteConditionalProcessor implements PublishingProcessor {
+public class PerSiteConditionalProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(PerSiteConditionalProcessor.class);
 
     protected Map<String, PublishingProcessor> processorMappings;
     protected PublishingProcessor defaultProcessor;
-    protected int order = Integer.MAX_VALUE;
-
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 
     public Map<String, PublishingProcessor> getProcessorMappings() {
         return processorMappings;
@@ -69,11 +59,6 @@ public class PerSiteConditionalProcessor implements PublishingProcessor {
 
             processor.doProcess(siteConfiguration, changeSet);
         }
-    }
-
-    @Override
-    public String getName() {
-        return PerSiteConditionalProcessor.class.getSimpleName();
     }
 
 }

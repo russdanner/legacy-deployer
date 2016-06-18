@@ -1,5 +1,31 @@
 package org.craftercms.cstudio.publishing.processor;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.mail.Address;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -18,19 +44,10 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
  * <p>A post processor that sends email with the content published</p>
  */
-public class EmailProcessor implements PublishingProcessor {
+public class EmailProcessor extends AbstractPublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(EmailProcessor.class);
 
@@ -91,17 +108,6 @@ public class EmailProcessor implements PublishingProcessor {
 
     // content replacement
     private Map<String, String> contentReplacements;
-
-    protected int order = Integer.MAX_VALUE;
-
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
-
-    @Override
-    public String getName() {
-        return "EmailProcessor";
-    }
 
     @Override
     public void doProcess(PublishedChangeSet changeSet,

@@ -55,6 +55,7 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
     @Override
     protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
         FlatteningDocumentProcessor processor = new FlatteningDocumentProcessor();
+
         if (StringUtils.isNotEmpty(includeElementXPathQuery)) {
             processor.setIncludeElementXPathQuery(includeElementXPathQuery);
         }

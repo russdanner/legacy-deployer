@@ -28,7 +28,7 @@ import org.dom4j.io.SAXReader;
  * @deprecated replaced by {@link SearchIndexingProcessor}
  */
 @Deprecated
-public class SearchAttachmentWithExternalMetadataPostProcessor implements PublishingProcessor {
+public class SearchAttachmentWithExternalMetadataPostProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchAttachmentWithExternalMetadataPostProcessor.class);
 
@@ -46,7 +46,6 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         put("_s","_t");
         put("_smv","_tmv");
     }};
-    protected int order = Integer.MAX_VALUE;
 
     @Override
     public void doProcess(final PublishedChangeSet changeSet, final Map<String, String> parameters,
@@ -243,7 +242,8 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
             }
             for (String substitutionKey : tokenizeSubstitutionMap.keySet()) {
                 if (elemName.endsWith(substitutionKey)) {
-                    String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) + tokenizeSubstitutionMap.get(substitutionKey);
+                    String newElementName = elemName.substring(0, elemName.length() - substitutionKey.length()) +
+                                            tokenizeSubstitutionMap.get(substitutionKey);
                     if (logger.isDebugEnabled()) {
                         logger.debug("Adding new element for tokenized search: " + newElementName);
                     }
@@ -254,13 +254,6 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         }
         return document;
     }
-
-
-    @Override
-    public String getName() {
-        return SearchAttachmentWithExternalMetadataPostProcessor.class.getSimpleName();
-    }
-
 
     public String getSiteName() {
         return siteName;
@@ -345,7 +338,4 @@ public class SearchAttachmentWithExternalMetadataPostProcessor implements Publis
         this.tokenizeSubstitutionMap = tokenizeSubstitutionMap;
     }
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 }

@@ -27,7 +27,7 @@ import org.craftercms.deployer.git.config.SiteConfiguration;
  *
  * @author hyanghee
  */
-public class SamplePostProcessor implements PublishingProcessor {
+public class SamplePostProcessor extends AbstractPublishingProcessor {
 
     private static Log LOGGER = LogFactory.getLog(SamplePostProcessor.class);
 
@@ -62,23 +62,4 @@ public class SamplePostProcessor implements PublishingProcessor {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.craftercms.cstudio.publishing.processor.PublishingProcessor#getName()
-     */
-    @Override
-    public String getName() {
-        return "SamplePostProcessor";
-    }
-
-    protected int order = Integer.MAX_VALUE;
-
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
 }

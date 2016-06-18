@@ -17,11 +17,10 @@ import org.springframework.beans.factory.annotation.Required;
  *
  * @author avasquez
  */
-public class SearchIndexingProcessor implements PublishingProcessor {
+public class SearchIndexingProcessor extends AbstractPublishingProcessor {
 
     public static final String DEFAULT_DEFAULT_INDEX_ID_FORMAT = "%s-default";
 
-    protected int order;
     protected String indexId;
     protected String defaultIndexIdFormat;
     protected boolean ignoreIndexId;
@@ -30,7 +29,6 @@ public class SearchIndexingProcessor implements PublishingProcessor {
     protected BatchIndexer batchIndexer;
 
     public SearchIndexingProcessor() {
-        order = Integer.MAX_VALUE;
         defaultIndexIdFormat = DEFAULT_DEFAULT_INDEX_ID_FORMAT;
     }
 
@@ -58,20 +56,6 @@ public class SearchIndexingProcessor implements PublishingProcessor {
     @Required
     public void setBatchIndexer(BatchIndexer batchIndexer) {
         this.batchIndexer = batchIndexer;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    @Override
-    public String getName() {
-        return SearchIndexingProcessor.class.getSimpleName();
-    }
-
-    @Override
-    public int getOrder() {
-        return order;
     }
 
     @Override
