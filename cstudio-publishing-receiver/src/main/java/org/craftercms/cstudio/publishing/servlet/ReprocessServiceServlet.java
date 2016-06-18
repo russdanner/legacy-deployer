@@ -1,24 +1,29 @@
 package org.craftercms.cstudio.publishing.servlet;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.processor.PublishingProcessor;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.cstudio.publishing.target.TargetManager;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
+import org.springframework.util.MimeTypeUtils;
 
 /**
  * <p>Reindex the target site assuming that target index is clean</p>
@@ -45,6 +50,10 @@ public class ReprocessServiceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Map<String, String> parameters = this.getParameters(request);
         String password = parameters.get(PARAM_PASSWORD);
+        PrintWriter responseWriter = response.getWriter();
+
+        response.setContentType(MimeTypeUtils.TEXT_PLAIN_VALUE);
+
         // authenticate the request
         if (password != null && password.equalsIgnoreCase(this.password)) {
             // find the target
@@ -66,27 +75,43 @@ public class ReprocessServiceServlet extends HttpServlet {
                 if (targetProcessor != null) {
                     // if found, reprocess the target
                     int status = reprocess(target, parameters, targetProcessor);
+
                     response.setStatus(status);
+                    if (status == HttpServletResponse.SC_OK) {
+                        responseWriter.println("Reprocess finished successfully");
+
+                        LOGGER.info("Reprocess finished successfully");
+                    } else {
+                        responseWriter.println("Reprocess failed");
+
+                        LOGGER.error("Reprocess failed");
+                    }
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    responseWriter.println("No processor found by name: " + processorName);
+
                     if (LOGGER.isWarnEnabled()) {
                         LOGGER.warn("No processor found by name: " + processorName);
                     }
                 }
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                responseWriter.println("No configuration exists for " + paramTarget);
+
                 if (LOGGER.isWarnEnabled()) {
                     LOGGER.warn("No configuration exists for " + paramTarget);
                 }
             }
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            responseWriter.println("Illegal publish request received");
+
             if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Illegal publish request received.");
+                LOGGER.warn("Illegal publish request received");
             }
         }
 
-
+        responseWriter.flush();
     }
 
     /**

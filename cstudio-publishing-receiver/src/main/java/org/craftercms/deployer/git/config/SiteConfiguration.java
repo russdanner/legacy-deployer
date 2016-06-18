@@ -1,31 +1,66 @@
 package org.craftercms.deployer.git.config;
 
-import org.craftercms.deployer.git.processor.PublishingProcessor;
-
 import java.util.List;
+
+import org.craftercms.deployer.git.processor.PublishingProcessor;
 
 public class SiteConfiguration {
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getName() {
+        return name;
+    }
 
-    public String getSiteId() { return siteId; }
-    public void setSiteId(String siteId) { this.siteId = siteId; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String getLocalRepositoryRoot() { return localRepositoryRoot; }
-    public void setLocalRepositoryRoot(String localRepositoryRoot) { this.localRepositoryRoot = localRepositoryRoot; }
+    public String getSiteId() {
+        return siteId;
+    }
 
-    public String getGitRepositoryUrl() { return gitRepositoryUrl; }
-    public void setGitRepositoryUrl(String gitRepositoryUrl) { this.gitRepositoryUrl = gitRepositoryUrl; }
+    public void setSiteId(String siteId) {
+        this.siteId = siteId;
+    }
 
-    public String getLiveSiteUrl() { return liveSiteUrl; }
-    public void setLiveSiteUrl(String liveSiteUrl) { this.liveSiteUrl = liveSiteUrl; }
+    public String getLocalRepositoryRoot() {
+        return localRepositoryRoot;
+    }
 
-    public String getSearchServiceUrl() { return searchServiceUrl; }
-    public void setSearchServiceUrl(String searchServiceUrl) { this.searchServiceUrl = searchServiceUrl; }
+    public void setLocalRepositoryRoot(String localRepositoryRoot) {
+        this.localRepositoryRoot = localRepositoryRoot;
+    }
 
-    public List<PublishingProcessor> getPostProcessors() { return postProcessors; }
-    public void setPostProcessors(List<PublishingProcessor> postProcessors) { this.postProcessors = postProcessors; }
+    public String getGitRepositoryUrl() {
+        return gitRepositoryUrl;
+    }
+
+    public void setGitRepositoryUrl(String gitRepositoryUrl) {
+        this.gitRepositoryUrl = gitRepositoryUrl;
+    }
+
+    public String getLiveSiteUrl() {
+        return liveSiteUrl;
+    }
+
+    public void setLiveSiteUrl(String liveSiteUrl) {
+        this.liveSiteUrl = liveSiteUrl;
+    }
+
+    public String getSearchServiceUrl() {
+        return searchServiceUrl;
+    }
+
+    public void setSearchServiceUrl(String searchServiceUrl) {
+        this.searchServiceUrl = searchServiceUrl;
+    }
+
+    public List<PublishingProcessor> getPostProcessors() {
+        return postProcessors;
+    }
+
+    public void setPostProcessors(List<PublishingProcessor> postProcessors) {
+        this.postProcessors = postProcessors;
+    }
 
     private String name;
     private String siteId;
@@ -34,4 +69,5 @@ public class SiteConfiguration {
     private String liveSiteUrl;
     private String searchServiceUrl;
     private List<PublishingProcessor> postProcessors;
+
 }

@@ -16,14 +16,15 @@
  */
 package org.craftercms.cstudio.publishing.servlet;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.util.MimeTypeUtils;
 
 public class StatusMonitoringServlet extends HttpServlet {
 
@@ -36,7 +37,7 @@ public class StatusMonitoringServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html;charset=utf-8");
+        response.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         response.getWriter().println("{ status: \"" + statusMessage + "\" }");
         response.setStatus(HttpServletResponse.SC_OK);
     }

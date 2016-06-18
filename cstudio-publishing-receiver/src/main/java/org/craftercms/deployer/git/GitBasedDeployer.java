@@ -1,5 +1,15 @@
 package org.craftercms.deployer.git;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
@@ -9,7 +19,7 @@ import org.craftercms.deployer.git.processor.PublishingProcessor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.PullResult;
-import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.errors.AmbiguousObjectException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -23,18 +33,6 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.nodes.Tag;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GitBasedDeployer {
 
@@ -48,8 +46,7 @@ public class GitBasedDeployer {
                 try {
                     logger.debug("Loading configuration");
                     List<String> sites = siteConfigurationLoader.getSitesList();
-                    for (String site :
-                            sites) {
+                    for (String site : sites) {
                         SiteConfiguration siteConfiguration = siteConfigurationLoader.loadSiteConfiguration(site);
                         checkDeploymentUpdatesForSite(siteConfiguration);
                     }

@@ -19,9 +19,13 @@ package org.craftercms.cstudio.publishing.processor;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.FlatteningDocumentProcessor;
+import org.craftercms.search.batch.utils.xml.DocumentProcessor;
+import org.craftercms.search.batch.utils.xml.FlatteningDocumentProcessor;
 
+/**
+ * @deprecated replaced by {@link SearchIndexingProcessor}
+ */
+@Deprecated
 public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
 
     protected String includeElementXPathQuery;
@@ -51,6 +55,7 @@ public class SearchUpdateFlattenXmlProcessor extends SearchUpdateProcessor {
     @Override
     protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
         FlatteningDocumentProcessor processor = new FlatteningDocumentProcessor();
+
         if (StringUtils.isNotEmpty(includeElementXPathQuery)) {
             processor.setIncludeElementXPathQuery(includeElementXPathQuery);
         }

@@ -33,14 +33,17 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
 import org.craftercms.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Required;
 
-public class SearchAttachmentProcessor implements PublishingProcessor {
+/**
+ * @deprecated replaced by {@link SearchIndexingProcessor}
+ */
+@Deprecated
+public class SearchAttachmentProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchAttachmentProcessor.class);
 
     private String siteName;
     private SearchService searchService;
     private List<String> supportedMimeTypes;
-    protected int order = Integer.MAX_VALUE;
 
     /**
      * set a sitename to override in index
@@ -117,12 +120,4 @@ public class SearchAttachmentProcessor implements PublishingProcessor {
         }
     }
 
-    @Override
-    public String getName() {
-        return SearchAttachmentProcessor.class.getSimpleName();
-    }
-
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 }

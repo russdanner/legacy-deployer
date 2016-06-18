@@ -44,14 +44,14 @@ public interface PublishingProcessor {
 	 * @param target
 	 * @throws PublishingException
 	 */
-	public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException;
+	void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException;
 	
 	/**
 	 * get the process's name
 	 * 
 	 * @return
 	 */
-	public String getName();
+	String getName();
 
     /**
      * get the order value for ordering in the list of processors.

@@ -33,8 +33,10 @@ import org.craftercms.cstudio.publishing.target.PublishingTarget;
  * Post processor that invalidates crafter cache
  *
  * @author Dejan Brkic
+ * @deprecated replaced by {@link HttpMethodCallPostProcessor}
  */
-public class CacheInvalidatePostProcessor implements PublishingProcessor {
+@Deprecated
+public class CacheInvalidatePostProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(CacheInvalidatePostProcessor.class);
 
@@ -73,12 +75,4 @@ public class CacheInvalidatePostProcessor implements PublishingProcessor {
         }
     }
 
-    @Override
-    public String getName() {
-        return CacheInvalidatePostProcessor.class.getName();
-    }
-
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
 }

@@ -1,5 +1,11 @@
 package org.craftercms.deployer.git.processor;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
@@ -10,33 +16,30 @@ import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.deployer.git.config.SiteConfiguration;
 import org.springframework.beans.factory.annotation.Required;
 
-import java.util.*;
-
 /**
  * {@link PublishingProcessor} decorator that maps file path patterns to post processors, so if files of the change
  * set match a pattern, the corresponding post processor is called for those files
  *
  * @author avasquez
  */
-public class OnPathMatchConditionalProcessor implements PublishingProcessor {
+public class OnPathMatchConditionalProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(OnPathMatchConditionalProcessor.class);
 
     protected Map<String[], PublishingProcessor> processorMappings;
-    protected int order = Integer.MAX_VALUE;
 
-    @Override
-    public int getOrder() { return order; }
-    public void setOrder(int order) { this.order = order; }
+    public Map<String[], PublishingProcessor> getProcessorMappings() {
+        return processorMappings;
+    }
 
-    public Map<String[], PublishingProcessor> getProcessorMappings() { return processorMappings; }
     @Required
     public void setProcessorMappings(Map<String[], PublishingProcessor> processorMappings) {
         this.processorMappings = processorMappings;
     }
 
     @Override
-    public void doProcess(SiteConfiguration siteConfiguration, PublishedChangeSet changeSet) throws PublishingException {
+    public void doProcess(SiteConfiguration siteConfiguration,
+                          PublishedChangeSet changeSet) throws PublishingException {
         List<String> createdFiles = copyFileList(changeSet.getCreatedFiles());
         List<String> updatedFiles = copyFileList(changeSet.getUpdatedFiles());
         List<String> deletedFiles = copyFileList(changeSet.getDeletedFiles());
@@ -87,11 +90,6 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
         }
     }
 
-    @Override
-    public String getName() {
-        return OnPathMatchConditionalProcessor.class.getSimpleName();
-    }
-
     protected boolean matchesAnyPattern(String path, String[] patterns) {
         if (StringUtils.isNotEmpty(path) && ArrayUtils.isNotEmpty(patterns)) {
             for (String pattern : patterns) {
@@ -109,7 +107,7 @@ public class OnPathMatchConditionalProcessor implements PublishingProcessor {
     }
 
     protected List<String> copyFileList(List<String> files) {
-        return CollectionUtils.isNotEmpty(files)? new ArrayList<>(files) : Collections.<String>emptyList();
+        return CollectionUtils.isNotEmpty(files)? new ArrayList<>(files): Collections.<String>emptyList();
     }
 
 }

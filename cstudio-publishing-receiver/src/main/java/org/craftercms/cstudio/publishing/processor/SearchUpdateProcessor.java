@@ -31,11 +31,11 @@ import org.craftercms.cstudio.publishing.PublishedChangeSet;
 import org.craftercms.cstudio.publishing.exception.PublishingException;
 import org.craftercms.cstudio.publishing.servlet.FileUploadServlet;
 import org.craftercms.cstudio.publishing.target.PublishingTarget;
-import org.craftercms.cstudio.publishing.utils.XmlUtils;
-import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.DocumentProcessorChain;
-import org.craftercms.cstudio.publishing.utils.xml.FieldRenamingDocumentProcessor;
-import org.craftercms.cstudio.publishing.utils.xml.TokenizeAttributeParsingDocumentProcessor;
+import org.craftercms.search.batch.utils.XmlUtils;
+import org.craftercms.search.batch.utils.xml.DocumentProcessor;
+import org.craftercms.search.batch.utils.xml.DocumentProcessorChain;
+import org.craftercms.search.batch.utils.xml.FieldRenamingDocumentProcessor;
+import org.craftercms.search.batch.utils.xml.TokenizeAttributeParsingDocumentProcessor;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -45,12 +45,13 @@ import org.springframework.beans.factory.annotation.Required;
  * Processor to update the Crafter Search engine index.
  *
  * @author Alfonso Vásquez
+ * @deprecated replaced by {@link SearchIndexingProcessor}
  */
-public class SearchUpdateProcessor implements PublishingProcessor {
+@Deprecated
+public class SearchUpdateProcessor extends AbstractPublishingProcessor {
 
     private static final Log logger = LogFactory.getLog(SearchUpdateProcessor.class);
 
-    protected int order;
     protected SearchService searchService;
     protected String siteName;
     protected Map<String, String> fieldMappings;
@@ -101,15 +102,6 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         this.documentProcessor = documentProcessor;
     }
 
-    @Override
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
     @PostConstruct
     public void init() {
         if (documentProcessor == null) {
@@ -147,11 +139,6 @@ public class SearchUpdateProcessor implements PublishingProcessor {
         }
 
         searchService.commit();
-    }
-
-    @Override
-    public String getName() {
-        return SearchUpdateProcessor.class.getSimpleName();
     }
 
     protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
