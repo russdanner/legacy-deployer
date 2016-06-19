@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.CharEncoding;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +56,7 @@ public class SearchUpdateProcessor extends AbstractPublishingProcessor {
     protected SearchService searchService;
     protected String siteName;
     protected Map<String, String> fieldMappings;
-    protected String charEncoding;
+    private String charEncoding = CharEncoding.UTF_8;
     protected String tokenizeAttribute;
     protected Map<String, String> tokenizeSubstitutionMap;
     protected DocumentProcessor documentProcessor;
