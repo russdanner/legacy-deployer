@@ -1,5 +1,6 @@
 package org.craftercms.cstudio.publishing.processor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,8 @@ import org.craftercms.search.service.SearchService;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * {@link PublishingProcessor} that uses a {@link BatchIndexer} to update a Crafter Search index. This processor
- * replaces all previous search processors.
+ * {@link PublishingProcessor} that uses a list of {@link BatchIndexer}s to update a Crafter Search index. This
+ * processor replaces all previous search processors.
  *
  * @author avasquez
  */
@@ -29,7 +30,7 @@ public class SearchIndexingProcessor extends AbstractPublishingProcessor {
     protected boolean ignoreIndexId;
     protected String siteName;
     protected SearchService searchService;
-    protected BatchIndexer batchIndexer;
+    protected List<BatchIndexer> batchIndexers;
 
     public SearchIndexingProcessor() {
         defaultIndexIdFormat = DEFAULT_DEFAULT_INDEX_ID_FORMAT;
@@ -56,14 +57,21 @@ public class SearchIndexingProcessor extends AbstractPublishingProcessor {
         this.searchService = searchService;
     }
 
-    @Required
     public void setBatchIndexer(BatchIndexer batchIndexer) {
-        this.batchIndexer = batchIndexer;
+        this.batchIndexers = Collections.singletonList(batchIndexer);
+    }
+
+    public void setBatchIndexers(List<BatchIndexer> batchIndexers) {
+        this.batchIndexers = batchIndexers;
     }
 
     @Override
     public void doProcess(PublishedChangeSet changeSet, Map<String, String> parameters,
                           PublishingTarget target) throws PublishingException {
+        if (CollectionUtils.isEmpty(batchIndexers)) {
+            throw new IllegalStateException("At least one batch indexer should be provided");
+        }
+
         String rootFolder = target.getParameter(FileUploadServlet.CONFIG_ROOT);
         String contentFolder = target.getParameter(FileUploadServlet.CONFIG_CONTENT_FOLDER);
         String siteName = getActualSiteId(parameters);
@@ -81,13 +89,19 @@ public class SearchIndexingProcessor extends AbstractPublishingProcessor {
         List<String> deletedFiles = changeSet.getDeletedFiles();
 
         if (CollectionUtils.isNotEmpty(createdFiles)) {
-            updateCount = batchIndexer.updateIndex(indexId, siteName, rootFolder, createdFiles, false);
+            for (BatchIndexer indexer : batchIndexers) {
+                updateCount += indexer.updateIndex(indexId, siteName, rootFolder, createdFiles, false);
+            }
         }
         if (CollectionUtils.isNotEmpty(updatedFiles)) {
-            updateCount = batchIndexer.updateIndex(indexId, siteName, rootFolder, updatedFiles, false);
+            for (BatchIndexer indexer : batchIndexers) {
+                updateCount += indexer.updateIndex(indexId, siteName, rootFolder, updatedFiles, false);
+            }
         }
         if (CollectionUtils.isNotEmpty(deletedFiles)) {
-            updateCount = batchIndexer.updateIndex(indexId, siteName, rootFolder, deletedFiles, true);
+            for (BatchIndexer indexer : batchIndexers) {
+                updateCount += indexer.updateIndex(indexId, siteName, rootFolder, deletedFiles, true);
+            }
         }
 
         if (updateCount > 0) {
