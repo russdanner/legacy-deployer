@@ -81,8 +81,6 @@ public class VersioningService {
 
 	public String readVersion(String targetName) throws VersionException {
 		PublishingTarget target = this.targetManager.getTarget(targetName);
-		FileInputStream fin = null;
-		ByteArrayOutputStream out = null;
 		String readVersion = DEFAULT_VERSION;
 		if (target == null) {
 			LOGGER.error("Unable to get Target with name " + targetName);
@@ -95,34 +93,25 @@ public class VersioningService {
 			File f = new File(finalName);
 			if (f.exists()) {
 				LOGGER.debug("About to read " + finalName);
-				fin = new FileInputStream(f);
-				out = new ByteArrayOutputStream();
-				byte[] buff = new byte[BUFFER_SIZE];
-				while (fin.read(buff) >= 0) {
-					out.write(buff);
-				}
-				readVersion = new String(out.toByteArray(), charset);
-				// Version can not be empty File must be corrupt
-				if (StringUtils.isEmpty(readVersion)) {
-					readVersion = DEFAULT_VERSION;
-				}
+				try (FileInputStream fin = new FileInputStream(f);
+                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                        byte[] buff = new byte[BUFFER_SIZE];
+                        while (fin.read(buff) >= 0) {
+                            out.write(buff);
+                        }
+                        readVersion = new String(out.toByteArray(), charset);
+                        // Version can not be empty File must be corrupt
+                        if (StringUtils.isEmpty(readVersion)) {
+                            readVersion = DEFAULT_VERSION;
+                        }
+                } catch (IOException ioEx) {
+                    LOGGER.error("Unable to read or write file " + fileName, ioEx);
+                    throw new VersionException("Unable to read/write File " + fileName);
+                }
 			} else {
 				LOGGER.debug("Version File " + finalName + " does not exist returning default value");
 			}
-		} catch (IOException ioEx) {
-			LOGGER.error("Unable to read or write file " + fileName, ioEx);
-			throw new VersionException("Unable to read/write File " + fileName);
 		} finally {
-			try {
-				if (out != null) {
-					out.close();
-				}
-				if (fin != null) {
-					fin.close();
-				}
-			} catch (IOException ex) {
-				LOGGER.error("Unable to IO resources", ex);
-			}
             fileLock.unlock();
 		}
 		return readVersion;
