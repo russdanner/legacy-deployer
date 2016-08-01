@@ -17,11 +17,14 @@
 package org.craftercms.cstudio.publishing.processor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanNameAware;
 
 /**
- * Created by alfonsovasquez on 7/6/16.
+ * Base class for {@link PublishingProcessor}s.
+ *
+ * @author avasquez
  */
-public abstract class AbstractPublishingProcessor implements PublishingProcessor {
+public abstract class AbstractPublishingProcessor implements PublishingProcessor, BeanNameAware {
 
     protected String name;
     protected int order;
@@ -35,7 +38,8 @@ public abstract class AbstractPublishingProcessor implements PublishingProcessor
         return StringUtils.isNotEmpty(name)? name : getClass().getSimpleName();
     }
 
-    public void setName(String name) {
+    @Override
+    public void setBeanName(String name) {
         this.name = name;
     }
 
