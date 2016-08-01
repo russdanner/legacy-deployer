@@ -26,6 +26,8 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
  */
 public class PublishingReceiverMain {
 
+    private PublishingReceiverMain() {}
+
     public static void main(String[] args) throws Exception {
         Server server = initializeContext();
         server.start();
@@ -36,7 +38,9 @@ public class PublishingReceiverMain {
         System.setProperty("org.terracotta.quartz.skipUpdateCheck", "true");
     	FileSystemXmlApplicationContext context =
     		new FileSystemXmlApplicationContext("classpath:spring/application-context.xml");
-    	return (Server)context.getBean("Server");
+        Server server = (Server)context.getBean("Server");
+        context.close();
+    	return server;
     }
 
 }
