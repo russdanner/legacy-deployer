@@ -153,7 +153,7 @@ public class SearchUpdateProcessor extends AbstractPublishingProcessor {
             tapp.setTokenizeAttribute(tokenizeAttribute);
         }
         if (MapUtils.isNotEmpty(tokenizeSubstitutionMap)) {
-            tapp.setTokenizeSubstitutionMap(tokenizeSubstitutionMap);
+            tapp.setFieldSuffixMappings(tokenizeSubstitutionMap);
         }
 
         chain.add(frp);
