@@ -36,7 +36,6 @@ import org.craftercms.search.batch.utils.XmlUtils;
 import org.craftercms.search.batch.utils.xml.DocumentProcessor;
 import org.craftercms.search.batch.utils.xml.DocumentProcessorChain;
 import org.craftercms.search.batch.utils.xml.FieldRenamingDocumentProcessor;
-import org.craftercms.search.batch.utils.xml.TokenizeAttributeParsingDocumentProcessor;
 import org.craftercms.search.service.SearchService;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -57,8 +56,6 @@ public class SearchUpdateProcessor extends AbstractPublishingProcessor {
     protected String siteName;
     protected Map<String, String> fieldMappings;
     private String charEncoding = CharEncoding.UTF_8;
-    protected String tokenizeAttribute;
-    protected Map<String, String> tokenizeSubstitutionMap;
     protected DocumentProcessor documentProcessor;
 
     @Required
@@ -92,11 +89,11 @@ public class SearchUpdateProcessor extends AbstractPublishingProcessor {
     }
 
     public void setTokenizeAttribute(String tokenizeAttribute) {
-        this.tokenizeAttribute = tokenizeAttribute;
+        // Ignore, now this functionality is done by the server
     }
 
     public void setTokenizeSubstitutionMap(Map<String, String> tokenizeSubstitutionMap) {
-        this.tokenizeSubstitutionMap = tokenizeSubstitutionMap;
+        // Ignore, now this functionality is done by the server
     }
 
     public void setDocumentProcessor(DocumentProcessor documentProcessor) {
@@ -143,21 +140,12 @@ public class SearchUpdateProcessor extends AbstractPublishingProcessor {
     }
 
     protected List<DocumentProcessor> createDocumentProcessorChain(List<DocumentProcessor> chain) {
-        FieldRenamingDocumentProcessor frp = new FieldRenamingDocumentProcessor();
+        FieldRenamingDocumentProcessor processor = new FieldRenamingDocumentProcessor();
         if (MapUtils.isNotEmpty(fieldMappings)) {
-            frp.setFieldMappings(fieldMappings);
+            processor.setFieldMappings(fieldMappings);
         }
 
-        TokenizeAttributeParsingDocumentProcessor tapp = new TokenizeAttributeParsingDocumentProcessor();
-        if (StringUtils.isNotEmpty(tokenizeAttribute)) {
-            tapp.setTokenizeAttribute(tokenizeAttribute);
-        }
-        if (MapUtils.isNotEmpty(tokenizeSubstitutionMap)) {
-            tapp.setFieldSuffixMappings(tokenizeSubstitutionMap);
-        }
-
-        chain.add(frp);
-        chain.add(tapp);
+        chain.add(processor);
 
         return chain;
     }
