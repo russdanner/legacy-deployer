@@ -53,7 +53,7 @@ public class StopServiceServlet extends HttpServlet {
 		} else {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn("Illegal stop service request receivced.");
+				LOGGER.warn("Illegal stop service request received. Password parameter does not match configured password for deployer.");
 			}
 		}
 	}

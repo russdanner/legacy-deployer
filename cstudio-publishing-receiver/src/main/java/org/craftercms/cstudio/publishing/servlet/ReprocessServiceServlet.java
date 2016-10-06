@@ -54,10 +54,10 @@ public class ReprocessServiceServlet extends HttpServlet {
 
         response.setContentType(MimeTypeUtils.TEXT_PLAIN_VALUE);
 
+        String paramTarget = parameters.get(PARAM_TARGET);
         // authenticate the request
         if (password != null && password.equalsIgnoreCase(this.password)) {
             // find the target
-            String paramTarget = parameters.get(PARAM_TARGET);
             PublishingTarget target = this.targetManager.getTarget(paramTarget);
             if (target != null) {
                 // find the processor
@@ -104,10 +104,10 @@ public class ReprocessServiceServlet extends HttpServlet {
             }
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            responseWriter.println("Illegal publish request received");
+            responseWriter.println("Illegal publish request received. Password parameter does not match configured password for deployer.");
 
             if (LOGGER.isWarnEnabled()) {
-                LOGGER.warn("Illegal publish request received");
+                LOGGER.warn("Illegal publish request received. Password parameter does not match configured password for deployer.");
             }
         }
 
