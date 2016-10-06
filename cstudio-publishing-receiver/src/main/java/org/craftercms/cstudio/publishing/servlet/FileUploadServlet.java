@@ -115,7 +115,7 @@ public class FileUploadServlet extends HttpServlet {
                 } else {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     if (LOGGER.isWarnEnabled()) {
-                        LOGGER.warn("Illegal publish request received.");
+                        LOGGER.warn("Illegal publish request received. Password parameter does not match configured password for deployer.");
                     }
                 }
 			} catch (Exception e) {
