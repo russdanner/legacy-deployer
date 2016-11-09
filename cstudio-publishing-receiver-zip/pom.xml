@@ -45,6 +45,7 @@
             <groupId>org.craftercms</groupId>
             <artifactId>crafter-studio-publishing-receiver</artifactId>
             <version>${project.parent.version}</version>
+			<classifier>aio</classifier>
         </dependency>
     </dependencies>
 	
