@@ -1,0 +1,25 @@
+language: java
+jdk:
+ - oraclejdk8
+branches:
+  except:
+    - travis
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#craftercms"
+    use_notice: true
+    skip_join: true
+  slack: craftersoftware:7YiSb41ZG5rfMgiAY7Qgprc7
+addons:
+  sonarqube: true
+env:
+  global:
+    -   secure: "qWCniKvwcUM4N46so2LbxlA6L3cNDvKTsqvXAckVdspDG+Ho2o90owpRx3CVeupiIikM1Fomkkj3vCl9ng9mYVPGmJCQQhYQPIUGBwAJUP00/MROZtsZXI09cQecaV3TAtUty0cvvTFfh4h6EeqPEJ72b1MkLZKE0rKxkPLC9pqgyz4ORkbV6g/RuXmKxDH7nWDjD+ZagHK6y1Vx+HlJmPV4qWTghEFx3FKyGvcHZukuuni1778bM/GhEZAfp8tQ4Zo1WpBs5r64oIEX2EkPoLi70+0BHHpKxiYtJ6SKkS6dJqXLRYaDEYXolr3mtLEeNbxda6svWemFYvr9We1+uhaJ4e5o83WF37g9TDnSAAJIY20gTTREDYAAQPUy/g4wUVb7q6TBKGDWedmk4JZwEC4QGLV60J13s0sH/VaA/tWlC3XV25lXyJJOUI1aq7g+H66RnRfi29e/Po2dPO9lJxRHZ0VdgwBF7vDSj+sRjrpvaS6VGn/3hN5EWzoSykj6HqAlHdWETFmkQwvLDhogm/8NjNw9HbDl68vYGmAw3mgw31fEO+vtAk2haUGAvKFgknF307t4LUKtL5L4AM+KC3f+9h/mgc8jaq8CYK9Fq/fB8Ok1lZOu8eUp/GKwn37UWUGx7wavnx1Ug5uIJAanuLZALDe9bQaBHfvyFf5ev08="
+    - secure: "IPthtWbif4rN8rmaiSDF9yJriqfn41i6nqjf9FJLj9ogrTuR4865XBX8hdL9i/e10pYbKt0kHNgPVSov0evAh5l5yssW4zfv+wPIWujf7qhOQ4sPd3Do0n5hc+k4vu/qKBC6PpA6DCY6jhOlf8ULvRkq6jhbC5F/emXkqAUTz1QOBGUQO9l/vV0roUcS2Z38O2JTHv4bB0tymr36iXYO/ObtesiqFfiMi51gJaEfwkODwolsGbuYmKYx4ESNj7gi11jiP8LN76W1WsWQiBF282x8118PPiuiTset2hB9+Ho3/CthwepRP6f+3ij+8U+QjVEQizjHiK/sAWsUTKanXmg8eLMPqiXl9YGcBzKjsdaRNhSDsQ1SBBw+csnt2RYTrB1VzvPbJ3NOC+MUXcyXJs9zT9I6eKg+L60YMV3KcPSDl9b2jR7uzj0Jw5NfRxtKu8wJUrWQM5kHmJA24jpVDR3j4G4F+t0csEZwQAV+lxoPtOQBo5VR4YvVN//hsVUJMv6etYtxtFp4sd1uxBmXEuwZgas+xT8hVW7BDITvNOwGkuOYLrArQMfuOouvSsu8vtg8RstIi412qNJJV1ApansNkC5q5WxwFwLEm6pnakNsEulZyr3OYvozVh8BpgL2iYJ4YA4MY5OzE+kiylDW6gLaknEbVc2URhOpraTmMVk="
+    - secure: "HAMvgJLIOVL9dOydw1QJjtl0ii+P0qjWEnkHvnzwQ6/E/f8IXrutsq0AYcsics0A7WFY51Es11/F4FQ3k6TrTs1UseroU96XEaLHYsBb3pTEDowkMDB4CYbiJ4/XbdRQjlkzuj7FBsco2rdCF1eS9jcvdXVSHgvaNYJ+/wfYgQWX483R7PjDyEPjq7rBSEJ+LDQiLYLcdUgzYgvvO4ZRIt0D+ySoAN/BX0+Tghz3CnkWSSK84WKdpOjbU/e967fa+5CuK6poiA9TWrPmzXRUjvZ94Tu176u5bH0XShU6LIH+0m7Y2pWS/bMIsqYnx5OJa+60tO0V9hAluZdUQApnjYTxfFLY69KBo67CgddEUo2eJVeuZka0qcQLc6+9C0AybSV3zZdf/nHSdn/n5Zb3Fp2aet/sZrW3rZ0M8VdesovCfL4OmuTM7aFZl84e774MQR6hE5RJtZLlpCj9E9MVVP2yf0SRGjmJXnEh/nAEusaHM8l58N+khBQczNcUeLwDuwXC8BZqG9i1mIfw28pKpAbHv65en7batERX8MYKFH1Y++nlpBci4U/QopUA11bWJNS+Fd9ZPn7zQrBWkH87X3cVNYcmidYM9qFYh5NIKI8S08/J7h7OIAtZAwg9z1jk/QdHVOMlD0oAG6U/oGlM+lxRYuoy5tnmjvQj6N6XzSU="
+before_install: "git clone -b travis `git config --get remote.origin.url` target/travis"
+script:
+  # other script steps might be done before running the actual SonarQube analysis
+    - mvn deploy --settings target/travis/settings.xml
+    - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN
