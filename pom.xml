@@ -27,6 +27,18 @@
         </license>
     </licenses>
 
+    <repositories>
+        <repository>
+            <id>sonatype-snapshots</id>
+            <name>sonatype Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
     <scm>
         <connection>scm:git:git://github.com/craftercms/deployer</connection>
         <developerConnection>scm:git:git://github.com/craftercms/deployer</developerConnection>
